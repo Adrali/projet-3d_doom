@@ -146,7 +146,7 @@ void MainWidget::initializeGL()
 
     transformation t;
     TypeMesh typeOfObject;
-    int valueOfObject;
+    int valueOfObject,idTexture;
     double tx, ty, tz, rx, ry, rz,sx,sy,sz;
 
     initializeOpenGLFunctions();
@@ -165,9 +165,11 @@ void MainWidget::initializeGL()
 //! [2]
     //Graphe de scène
     geometries = new GeometryEngine;
-    root = new gameobject(nullptr,transformation());
+    root = new gameobject(nullptr,transformation(),0);
 
-
+    //////////
+    /// Parsing de fichier
+    /////////
     if(!infile.open(QIODevice::ReadOnly)) {
         QMessageBox::information(0, "error", infile.errorString());
     }
@@ -177,39 +179,45 @@ void MainWidget::initializeGL()
 
     while (!in.atEnd())
     {
-        std::string line = in.readLine().toStdString();
-        std::stringstream(line) >> valueOfObject >> tx >> ty >> tz >> rx >> ry >> rz >> sx >> sy >> sz;
-        std::string path;
-        typeOfObject = (TypeMesh)valueOfObject;
+        QString qLine = in.readLine();
+        std::string line = qLine.toStdString();
+        if(line[0] == '#') {
+            qDebug() << "Commentaire : " << qPrintable(qLine);
 
-        //gameengine mesh;
-        switch(typeOfObject){
-            case PLAN:
-                //mesh = gameengine(plan)
-                    break;
-            case CUBE:
-                //mesh = gameengine(plan)
-                    break;
-            case SPHERE:
-                //mesh = gameengine(sphere)
-                    break;
-            case OBJECT:
-                //infile >> path;
-                //mesh = gameengine(object,path)
-                    break;
+        }else{
+            std::stringstream(line) >> valueOfObject >> tx >> ty >> tz >> rx >> ry >> rz >> sx >> sy >> sz >> idTexture;
+            std::string path;
+            typeOfObject = (TypeMesh)valueOfObject;
+            //gameengine mesh;
+            switch(typeOfObject){
+                case PLAN:
+                    //mesh = gameengine(plan)
+                        break;
+                case CUBE:
+                    //mesh = gameengine(plan)
+                        break;
+                case SPHERE:
+                    //mesh = gameengine(sphere)
+                        break;
+                case OBJECT:
+                    //infile >> path;
+                    //mesh = gameengine(object,path)
+                        break;
+            }
+            transformation  t = transformation();
+            t.addTranslation(tx,ty,tz);
+            t.addRotationX(rx);
+            t.addRotationY(ry);
+            t.addRotationZ(rz);
+            t.addScale(sx,sy,sz);
+            //appliquer les nouvelles transformations à t
+            gameobject * go = new gameobject(geometries,t,idTexture);
+            qDebug() <<"\tTransforms : " << tx << " " << ty <<" " << tz <<endl;
+            qDebug() << "\tRotations : " << rx << " " << ry << " " << rz << endl;
+            qDebug() << "\tScale " << sx << " " << sy << " " << sz << endl;
+            root->addChild(go);
         }
-        transformation  t = transformation();
-        t.addTranslation(tx,ty,tz);
-        t.addRotationX(rx);
-        t.addRotationY(ry);
-        t.addRotationZ(rz);
-        t.addScale(sx,sy,sz);
-        //appliquer les nouvelles transformations à t
-        gameobject * go = new gameobject(geometries,t);
-        qDebug() <<"\tTransforms : " << tx << " " << ty <<" " << tz <<endl;
-        qDebug() << "\tRotations : " << rx << " " << ry << " " << rz << endl;
-        qDebug() << "\tScale " << sx << " " << sy << " " << sz << endl;
-        root->addChild(go);
+
     }
     infile.close();
     // Use QBasicTimer because its faster than QTimer

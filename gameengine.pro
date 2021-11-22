@@ -1,5 +1,4 @@
 QT       += core gui widgets
-
 TARGET = gameengine
 TEMPLATE = app
 
@@ -26,4 +25,5 @@ target.path = $$[YOUR_PATH]
 INSTALLS += target
 
 DISTFILES += \
+    ../sound/fire.wav \
     map.txt

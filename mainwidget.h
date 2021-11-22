@@ -65,6 +65,8 @@
 #include <QOpenGLTexture>
 #include <QTimer>
 #include <QMessageBox>
+#include <QtDebug>
+
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -109,6 +111,7 @@ private:
     float rotationLuneAxeTerreY = 0;
     float rotationTerreAxeSoleilY = 0;
 
+    //QSound shootSFX("/home/e20200007675/M2_IMAGINE/Projet_Moteur_Jeux/sound/fire.wav");
     QMatrix4x4 projection;
 
     QVector2D mousePressPosition;
