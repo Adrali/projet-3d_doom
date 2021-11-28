@@ -54,7 +54,13 @@
 #include <QOpenGLFunctions_3_1>
 #include <QOpenGLShaderProgram>
 #include <QOpenGLBuffer>
+#include <vector>
 
+struct VertexData
+{
+    QVector3D position;
+    QVector2D texCoord;
+};
 class GeometryEngine : protected QOpenGLFunctions_3_1
 {
 public:
@@ -62,10 +68,16 @@ public:
     virtual ~GeometryEngine();
 
     void drawCubeGeometry(QOpenGLShaderProgram *program);
-
+    std::vector<QVector3D> getBaseVertices() const{
+        std::vector<QVector3D> v(baseVertices);
+        return v;}
+    std::vector<int> getIndex() const{
+        std::vector<int> v(baseIndex);
+        return v;}
 private:
     void initCubeGeometry();
-
+    std::vector<QVector3D> baseVertices;
+    std::vector<int> baseIndex;
     QOpenGLBuffer arrayBuf;
     QOpenGLBuffer indexBuf;
 

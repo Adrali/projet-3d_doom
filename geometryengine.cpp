@@ -55,11 +55,7 @@
 #include <QVector2D>
 #include <QVector3D>
 
-struct VertexData
-{
-    QVector3D position;
-    QVector2D texCoord;
-};
+
 
 //! [0]
 GeometryEngine::GeometryEngine()
@@ -126,7 +122,9 @@ void GeometryEngine::initCubeGeometry()
         {QVector3D(-1.0f,  1.0f, -1.0f), QVector2D(0.33f, 1.0f)}, // v22
         {QVector3D( 1.0f,  1.0f, -1.0f), QVector2D(0.66f, 1.0f)}  // v23
     };
-
+    for(VertexData ver : vertices){
+        baseVertices.push_back(ver.position);
+    }
 
 
     // Indices for drawing cube faces using triangle strips.
@@ -145,7 +143,9 @@ void GeometryEngine::initCubeGeometry()
         16, 16, 17, 18, 19, 19, // Face 4 - triangle strip (v16, v17, v18, v19)
         20, 20, 21, 22, 23      // Face 5 - triangle strip (v20, v21, v22, v23)
     };
-
+    for(int i : indices){
+        baseIndex.push_back(i);
+    }
 //! [1]
     // Transfer vertex data to VBO 0
     arrayBuf.bind();

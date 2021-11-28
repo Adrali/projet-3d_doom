@@ -28,3 +28,10 @@ void gameobject::displayAll(QOpenGLShaderProgram *program,QMatrix4x4 projection)
     mi.setToIdentity();
     displayAll(mi,program,projection);
 }
+std::vector<QVector3D> gameobject::getActualVertices(){
+    std::vector<QVector3D> vertices = mesh->getBaseVertices();
+    for(unsigned int i=0;i<vertices.size();i++){
+        vertices[i]= transform.applyTransformation(vertices[i]);
+    }
+    return vertices;
+}

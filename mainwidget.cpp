@@ -142,7 +142,7 @@ void MainWidget::timerEvent(QTimerEvent *)
 
 void MainWidget::initializeGL()
 {
-    QFile infile("/home/e20200007675/M2_IMAGINE/Projet_Moteur_Jeux/TP1_2_code/map.txt");
+    QFile infile("E:\\Master\\M2\\DOOM\\projet-3d_doom\\map.txt");
 
     transformation t;
     TypeMesh typeOfObject;
@@ -182,7 +182,7 @@ void MainWidget::initializeGL()
         QString qLine = in.readLine();
         std::string line = qLine.toStdString();
         if(line[0] == '#') {
-            qDebug() << "Commentaire : " << qPrintable(qLine);
+            //qDebug() << "Commentaire : " << qPrintable(qLine);
 
         }else{
             std::stringstream(line) >> valueOfObject >> tx >> ty >> tz >> rx >> ry >> rz >> sx >> sy >> sz >> idTexture;
@@ -212,9 +212,9 @@ void MainWidget::initializeGL()
             t.addScale(sx,sy,sz);
             //appliquer les nouvelles transformations à t
             gameobject * go = new gameobject(geometries,t,idTexture);
-            qDebug() <<"\tTransforms : " << tx << " " << ty <<" " << tz <<endl;
+            /*qDebug() <<"\tTransforms : " << tx << " " << ty <<" " << tz <<endl;
             qDebug() << "\tRotations : " << rx << " " << ry << " " << rz << endl;
-            qDebug() << "\tScale " << sx << " " << sy << " " << sz << endl;
+            qDebug() << "\tScale " << sx << " " << sy << " " << sz << endl;*/
             root->addChild(go);
         }
 

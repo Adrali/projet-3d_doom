@@ -1,13 +1,10 @@
 #include "transformation.h"
 #include <QQuaternion>
+#include <QVector4D>
 QVector3D transformation::applyTransformation(QVector3D v){
-    QVector3D vf = QVector3D(0,0,0);
-    for(int i=0;i<3;i++){
-        for(int j=0;j<4;j++){
-            vf[i]+=transform(i,j);
-        }
-    }
-    return vf;
+    QVector4D v_to_4D =  QVector4D(v, 1.0);
+    v_to_4D = transform*v_to_4D;
+    return v_to_4D.toVector3D();
 }
 /*void transformation::printMatrix(){
     qInfo() << translation * scale * rotationX * rotationY * rotationZ;
