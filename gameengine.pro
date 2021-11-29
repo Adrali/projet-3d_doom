@@ -3,7 +3,9 @@ TARGET = gameengine
 TEMPLATE = app
 
 SOURCES += main.cpp \
+    boundingbox.cpp \
     gameobject.cpp \
+    player.cpp \
     transformation.cpp
 
 SOURCES += \
@@ -11,9 +13,11 @@ SOURCES += \
     geometryengine.cpp
 
 HEADERS += \
+    boundingbox.h \
     gameobject.h \
     mainwidget.h \
     geometryengine.h \
+    player.h \
     transformation.h
 
 RESOURCES += \

@@ -55,18 +55,21 @@
 #include <QOpenGLShaderProgram>
 #include <QOpenGLBuffer>
 #include <vector>
-
+#include "boundingbox.h"
 struct VertexData
 {
     QVector3D position;
     QVector2D texCoord;
 };
+
 class GeometryEngine : protected QOpenGLFunctions_3_1
 {
 public:
+    ////Constructors
     GeometryEngine();
+    ////Destructor
     virtual ~GeometryEngine();
-
+    ////Methods
     void drawGeometry(QOpenGLShaderProgram *program);
     void initPlanGeometry();
     void initCubeGeometry();
@@ -77,12 +80,17 @@ public:
     std::vector<int> getIndex() const{
         std::vector<int> v(baseIndex);
         return v;}
+    boundingBox getBBox();
 private:
+
+    ////Methods
+    void setBBValue();
+    ////Variables
     std::vector<QVector3D> baseVertices;
     std::vector<int> baseIndex;
     QOpenGLBuffer arrayBuf;
     QOpenGLBuffer indexBuf;
-
+    boundingBox bb;
 };
 
 #endif // GEOMETRYENGINE_H

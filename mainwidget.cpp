@@ -56,15 +56,6 @@
 #include <QVector3D>
 
 
-#define RADIUS_SOLEIL 15.0
-#define DISTANCE_SOLEIL_TERRE 50.0
-#define INCLINAISON_TERRE_Z -23.44
-#define RADIUS_TERRE 6.378
-#define DISTANCE_TERRE_LUNE 20.405
-#define INCLINAISON_TERRE_LUNE 5.14
-#define RADIUS_LUNE 1.738
-#define INCLINAISON_LUNE_Z 6.68
-
 MainWidget::MainWidget(QWidget *parent) :
     QOpenGLWidget(parent),
     cubeGeometries(0),
@@ -149,7 +140,7 @@ void MainWidget::initializeGL()
     transformation t;
     TypeMesh typeOfObject;
     int valueOfObject,idTexture;
-    double tx, ty, tz, rx, ry, rz,sx,sy,sz;
+    double tx, ty, tz, rx, ry, rz, sx, sy, sz;
 
     initializeOpenGLFunctions();
 
@@ -157,7 +148,6 @@ void MainWidget::initializeGL()
 
     initShaders();
     initTextures();
-    qDebug() <<"Test" <<endl;
 //! [2]
     // Enable depth buffer
     glEnable(GL_DEPTH_TEST);
@@ -173,15 +163,16 @@ void MainWidget::initializeGL()
     planGeometries = new GeometryEngine;
     planGeometries->initPlanGeometry();
     root = new gameobject(nullptr,transformation(),0);
-
+    map = new gameobject(nullptr,transformation(),0);
+    entities = new gameobject(nullptr,transformation(),0);
+    root->addChild(map);
+    root->addChild(entities);
     //////////
     /// Parsing de fichier
     /////////
     if(!infile.open(QIODevice::ReadOnly)) {
         QMessageBox::information(0, "error", infile.errorString());
     }
-
-
     QTextStream in(&infile);
 
     while (!in.atEnd())
@@ -212,24 +203,36 @@ void MainWidget::initializeGL()
                     mesh = planGeometries;
                         break;
             }
-            transformation  t = transformation();
-            t.addTranslation(tx,ty,tz);
+            t = transformation();
+            t.addScale(sx,sy,sz);
+
             t.addRotationX(rx);
             t.addRotationY(ry);
             t.addRotationZ(rz);
-            t.addScale(sx,sy,sz);
+            t.addTranslation(tx,ty,tz);
+
             //appliquer les nouvelles transformations à t
             gameobject * go = new gameobject(mesh,t,idTexture);
             /*qDebug() <<"\tTransforms : " << tx << " " << ty <<" " << tz <<endl;
             qDebug() << "\tRotations : " << rx << " " << ry << " " << rz << endl;
             qDebug() << "\tScale " << sx << " " << sy << " " << sz << endl;*/
-            root->addChild(go);
+            QVector3D minVertex_,maxVertex_;
+
+            boundingBox bb = go->getBBox();
+            qDebug() <<"\tTransforms : " << bb.getMinVertex() << " " << bb.getMaxVertex() << "" << go->getBarycentre() <<endl;
+            map->addChild(go);
         }
 
     }
     infile.close();
     // Use QBasicTimer because its faster than QTimer
     timer.start(12, this);
+    t = transformation();
+    t.addTranslation(0,10,0);
+    player = new Player(cubeGeometries,t,1);
+    entities->addChild(player);
+    for(gameobject * g : map->getChilds())
+        qInfo() << g->getBBox().isOverBoundingBox(player->getBarycentre()) << endl;
 }
 
 //! [3]

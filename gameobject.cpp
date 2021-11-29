@@ -1,9 +1,6 @@
 #include "gameobject.h"
 
-gameobject::gameobject()
-{
-
-}
+gameobject::gameobject(){}
 void gameobject::displayObject(QMatrix4x4 parentTransform, QOpenGLShaderProgram *program,QMatrix4x4 projection){
     if(mesh){
         program->setUniformValue("mvp_matrix", projection * parentTransform * transform.getTransformationMatrix());
@@ -34,4 +31,17 @@ std::vector<QVector3D> gameobject::getActualVertices(){
         vertices[i]= transform.applyTransformation(vertices[i]);
     }
     return vertices;
+}
+
+boundingBox gameobject::getBBox(){
+    return boundingBox(getActualVertices());
+}
+
+QVector3D gameobject::getBarycentre(){
+    QVector3D barycentre(0,0,0);
+    std::vector<QVector3D> vertices = getActualVertices();
+    for(QVector3D v : vertices){
+        barycentre+=(1.0/vertices.size())*v;
+    }
+    return barycentre;
 }

@@ -54,7 +54,7 @@
 #include "geometryengine.h"
 #include "gameobject.h"
 #include "transformation.h"
-
+#include "player.h"
 #include <QOpenGLWidget>
 #include <QOpenGLFunctions_3_1>
 #include <QMatrix4x4>
@@ -103,18 +103,22 @@ private:
     QMap<int, bool> keys;
     QBasicTimer timer;
     QOpenGLShaderProgram program;
+    ////Variables
+    //Geometries
     GeometryEngine *cubeGeometries;
     GeometryEngine *planGeometries;
+    //Gameobjects
     gameobject * root;
-    QOpenGLTexture *texture;
-    float rotationTerreY = 0;
-    float rotationLuneY = 0;
-    float rotationLuneAxeTerreY = 0;
-    float rotationTerreAxeSoleilY = 0;
+    gameobject * map;
+    gameobject * entities;
+    Player * player;
 
+    //Textures
+    QOpenGLTexture *texture;
+
+    //Sounds
     //QSound shootSFX("/home/e20200007675/M2_IMAGINE/Projet_Moteur_Jeux/sound/fire.wav");
     QMatrix4x4 projection;
-
     QVector2D mousePressPosition;
     QVector3D rotationAxis;
     qreal angularSpeed;
