@@ -67,7 +67,10 @@ public:
     GeometryEngine();
     virtual ~GeometryEngine();
 
-    void drawCubeGeometry(QOpenGLShaderProgram *program);
+    void drawGeometry(QOpenGLShaderProgram *program);
+    void initPlanGeometry();
+    void initCubeGeometry();
+
     std::vector<QVector3D> getBaseVertices() const{
         std::vector<QVector3D> v(baseVertices);
         return v;}
@@ -75,7 +78,6 @@ public:
         std::vector<int> v(baseIndex);
         return v;}
 private:
-    void initCubeGeometry();
     std::vector<QVector3D> baseVertices;
     std::vector<int> baseIndex;
     QOpenGLBuffer arrayBuf;

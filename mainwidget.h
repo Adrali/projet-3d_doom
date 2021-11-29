@@ -103,7 +103,8 @@ private:
     QMap<int, bool> keys;
     QBasicTimer timer;
     QOpenGLShaderProgram program;
-    GeometryEngine *geometries;
+    GeometryEngine *cubeGeometries;
+    GeometryEngine *planGeometries;
     gameobject * root;
     QOpenGLTexture *texture;
     float rotationTerreY = 0;

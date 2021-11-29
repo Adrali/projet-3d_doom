@@ -7,7 +7,7 @@ gameobject::gameobject()
 void gameobject::displayObject(QMatrix4x4 parentTransform, QOpenGLShaderProgram *program,QMatrix4x4 projection){
     if(mesh){
         program->setUniformValue("mvp_matrix", projection * parentTransform * transform.getTransformationMatrix());
-        mesh->drawCubeGeometry(program);
+        mesh->drawGeometry(program);
     }
 
 }

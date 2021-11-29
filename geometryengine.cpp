@@ -68,7 +68,8 @@ GeometryEngine::GeometryEngine()
     indexBuf.create();
 
     // Initializes cube geometry and transfers it to VBOs
-    initCubeGeometry();
+    //initCubeGeometry();
+    initPlanGeometry();
 
 }
 
@@ -122,6 +123,7 @@ void GeometryEngine::initCubeGeometry()
         {QVector3D(-1.0f,  1.0f, -1.0f), QVector2D(0.33f, 1.0f)}, // v22
         {QVector3D( 1.0f,  1.0f, -1.0f), QVector2D(0.66f, 1.0f)}  // v23
     };
+    baseVertices.clear();
     for(VertexData ver : vertices){
         baseVertices.push_back(ver.position);
     }
@@ -143,6 +145,7 @@ void GeometryEngine::initCubeGeometry()
         16, 16, 17, 18, 19, 19, // Face 4 - triangle strip (v16, v17, v18, v19)
         20, 20, 21, 22, 23      // Face 5 - triangle strip (v20, v21, v22, v23)
     };
+    baseIndex.clear();
     for(int i : indices){
         baseIndex.push_back(i);
     }
@@ -157,7 +160,7 @@ void GeometryEngine::initCubeGeometry()
 //! [1]
 }
 
-void GeometryEngine::drawCubeGeometry(QOpenGLShaderProgram *program)
+void GeometryEngine::drawGeometry(QOpenGLShaderProgram *program)
 {
     // Tell OpenGL which VBOs to use
     arrayBuf.bind();
@@ -183,3 +186,73 @@ void GeometryEngine::drawCubeGeometry(QOpenGLShaderProgram *program)
     glDrawElements(GL_TRIANGLE_STRIP, indexBuf.size(), GL_UNSIGNED_SHORT, 0); //Careful update indicesNumber when creating new geometry
 }
 
+void GeometryEngine::initPlanGeometry(){
+    int nbrVertex = 64;
+    float MIN_POSITION = 0.0f;
+    float POSITION_RANGE = 10.0f; //Taille entre deux vertex
+
+    unsigned int vertexNumber = nbrVertex * nbrVertex ;
+
+    VertexData vertices[nbrVertex*nbrVertex];
+
+    int offset = 0;
+
+    // First, build the data for the vertex buffer
+    for (int y = 0; y <nbrVertex; y++)
+        for (int x = 0; x < nbrVertex; x++) {
+            float xRatio = x / (float) (nbrVertex - 1);
+
+            float yRatio = 1.0f - (y / (float) (nbrVertex - 1));
+
+            float xPosition = MIN_POSITION + (xRatio * POSITION_RANGE);
+            float yPosition = MIN_POSITION + (yRatio * POSITION_RANGE);
+
+             vertices[offset++]= {QVector3D(xPosition,yPosition,0.0f), QVector2D(float(x)/(nbrVertex-1),float(y)/(nbrVertex-1))};
+
+
+    };
+    baseVertices.clear();
+    for(VertexData ver : vertices){
+        baseVertices.push_back(ver.position);
+    }
+    int numStripsRequired = nbrVertex - 1;
+    int numDegensRequired = 2 * (numStripsRequired - 1);
+    int verticesPerStrip = 2 * nbrVertex;
+
+    GLushort heightMapIndexData [(verticesPerStrip * numStripsRequired)
+            + numDegensRequired];
+
+    offset = 0;
+
+    for (int y = 0; y <nbrVertex- 1; y++) {      if (y > 0) {
+            // Degenerate begin: repeat first vertex
+            heightMapIndexData[offset++] = (short) (y * nbrVertex);
+        }
+
+        for (int x = 0; x<nbrVertex; x++) {
+            // One part of the strip
+            heightMapIndexData[offset++] = (short) ((y * nbrVertex) + x);
+            heightMapIndexData[offset++] = (short) (((y + 1) * nbrVertex) + x);
+        }
+
+        if (y<nbrVertex - 2) {
+            // Degenerate end: repeat last vertex
+            heightMapIndexData[offset++] = (short) (((y + 1) *nbrVertex) + (nbrVertex - 1));
+        }
+    }
+    unsigned int indexCount =  sizeof(heightMapIndexData)/sizeof(heightMapIndexData[0]);
+    baseIndex.clear();
+    for(int i : heightMapIndexData){
+        baseIndex.push_back(i);
+    }
+
+
+//! [1]
+    // Transfer vertex data to VBO 0
+    arrayBuf.bind();
+    arrayBuf.allocate(vertices, vertexNumber * sizeof(VertexData));
+
+    // Transfer index data to VBO 1
+    indexBuf.bind();
+    indexBuf.allocate(heightMapIndexData,  indexCount * sizeof(GLushort));
+}

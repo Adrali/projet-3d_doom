@@ -29,10 +29,10 @@ public :
     int getIdTexture(){return idTexture;}
     std::vector<QVector3D> getActualVertices();
     void displayBaseValue(){
-        qInfo() << "Creation"<<Qt::endl;
+        qInfo() << "Creation"<<endl;
         std::vector<QVector3D> v = mesh->getBaseVertices();
         for(QVector3D ver : v){
-            qInfo()<<ver<<Qt::endl;
+            qInfo()<<ver<<endl;
         }
     }
 

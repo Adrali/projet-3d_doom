@@ -67,7 +67,8 @@
 
 MainWidget::MainWidget(QWidget *parent) :
     QOpenGLWidget(parent),
-    geometries(0),
+    cubeGeometries(0),
+    planGeometries(0),
     texture(0),
     angularSpeed(0)
 {
@@ -79,7 +80,8 @@ MainWidget::~MainWidget()
     // and the buffers.
     makeCurrent();
     delete texture;
-    delete geometries;
+    delete cubeGeometries;
+    delete planGeometries;
     doneCurrent();
 }
 
@@ -142,7 +144,7 @@ void MainWidget::timerEvent(QTimerEvent *)
 
 void MainWidget::initializeGL()
 {
-    QFile infile("E:\\Master\\M2\\DOOM\\projet-3d_doom\\map.txt");
+    QFile infile("/home/e20200007675/M2_IMAGINE/Projet_Moteur_Jeux_v/v1/map.txt");
 
     transformation t;
     TypeMesh typeOfObject;
@@ -164,7 +166,12 @@ void MainWidget::initializeGL()
     glEnable(GL_CULL_FACE);
 //! [2]
     //Graphe de scène
-    geometries = new GeometryEngine;
+
+    GeometryEngine * mesh;
+    cubeGeometries = new GeometryEngine;
+    cubeGeometries->initCubeGeometry();
+    planGeometries = new GeometryEngine;
+    planGeometries->initPlanGeometry();
     root = new gameobject(nullptr,transformation(),0);
 
     //////////
@@ -191,17 +198,18 @@ void MainWidget::initializeGL()
             //gameengine mesh;
             switch(typeOfObject){
                 case PLAN:
-                    //mesh = gameengine(plan)
+                    mesh = planGeometries;
                         break;
                 case CUBE:
-                    //mesh = gameengine(plan)
+                    mesh = cubeGeometries;
                         break;
                 case SPHERE:
-                    //mesh = gameengine(sphere)
+                    mesh = planGeometries;
                         break;
                 case OBJECT:
                     //infile >> path;
                     //mesh = gameengine(object,path)
+                    mesh = planGeometries;
                         break;
             }
             transformation  t = transformation();
@@ -211,7 +219,7 @@ void MainWidget::initializeGL()
             t.addRotationZ(rz);
             t.addScale(sx,sy,sz);
             //appliquer les nouvelles transformations à t
-            gameobject * go = new gameobject(geometries,t,idTexture);
+            gameobject * go = new gameobject(mesh,t,idTexture);
             /*qDebug() <<"\tTransforms : " << tx << " " << ty <<" " << tz <<endl;
             qDebug() << "\tRotations : " << rx << " " << ry << " " << rz << endl;
             qDebug() << "\tScale " << sx << " " << sy << " " << sz << endl;*/
