@@ -135,7 +135,7 @@ void MainWidget::timerEvent(QTimerEvent *)
 
 void MainWidget::initializeGL()
 {
-    QFile infile("/home/e20200007675/M2_IMAGINE/Projet_Moteur_Jeux_v/v1/map.txt");
+    QFile infile("E:\\Master\\M2\\DOOM\\projet-3d_doom\\map.txt");
 
     transformation t;
     TypeMesh typeOfObject;
@@ -167,6 +167,13 @@ void MainWidget::initializeGL()
     entities = new gameobject(nullptr,transformation(),0);
     root->addChild(map);
     root->addChild(entities);
+
+
+    t = transformation();
+    t.addTranslation(0,10,0);
+    player = new Player(cubeGeometries,t,1);
+    entities->addChild(player);
+
     //////////
     /// Parsing de fichier
     /////////
@@ -216,10 +223,15 @@ void MainWidget::initializeGL()
             /*qDebug() <<"\tTransforms : " << tx << " " << ty <<" " << tz <<endl;
             qDebug() << "\tRotations : " << rx << " " << ry << " " << rz << endl;
             qDebug() << "\tScale " << sx << " " << sy << " " << sz << endl;*/
-            QVector3D minVertex_,maxVertex_;
-
             boundingBox bb = go->getBBox();
             qDebug() <<"\tTransforms : " << bb.getMinVertex() << " " << bb.getMaxVertex() << "" << go->getBarycentre() <<endl;
+
+            if(go->getBBox().isOverBoundingBox(player->getBarycentre())){
+
+
+                triangle cTriangle = go->getClosestTriangle(player->getBarycentre());
+                qDebug() << cTriangle.getT1() << cTriangle.getT2() << cTriangle.getT3() << Qt::endl;
+            }
             map->addChild(go);
         }
 
@@ -227,12 +239,6 @@ void MainWidget::initializeGL()
     infile.close();
     // Use QBasicTimer because its faster than QTimer
     timer.start(12, this);
-    t = transformation();
-    t.addTranslation(0,10,0);
-    player = new Player(cubeGeometries,t,1);
-    entities->addChild(player);
-    for(gameobject * g : map->getChilds())
-        qInfo() << g->getBBox().isOverBoundingBox(player->getBarycentre()) << endl;
 }
 
 //! [3]

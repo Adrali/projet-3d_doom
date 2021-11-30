@@ -30,13 +30,11 @@ public :
       //Getters
     int getIdTexture(){return idTexture;}
     std::vector<QVector3D> getActualVertices();
+    std::vector<int> getActualIndexs(){return mesh->getIndex();}
     boundingBox getBBox();
     QVector3D getBarycentre();
 
-
-
-
-
+    triangle getClosestTriangle(QVector3D p);
 
     //Debug methods
     void displayBaseValue(){
@@ -46,6 +44,8 @@ public :
             qInfo()<<ver<<endl;
         }
     }
+
+
 
 
 private:

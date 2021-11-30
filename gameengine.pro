@@ -6,7 +6,8 @@ SOURCES += main.cpp \
     boundingbox.cpp \
     gameobject.cpp \
     player.cpp \
-    transformation.cpp
+    transformation.cpp \
+    triangle.cpp
 
 SOURCES += \
     mainwidget.cpp \
@@ -18,7 +19,8 @@ HEADERS += \
     mainwidget.h \
     geometryengine.h \
     player.h \
-    transformation.h
+    transformation.h \
+    triangle.h
 
 RESOURCES += \
     shaders.qrc \

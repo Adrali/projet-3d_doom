@@ -56,6 +56,7 @@
 #include <QOpenGLBuffer>
 #include <vector>
 #include "boundingbox.h"
+#include "triangle.h"
 struct VertexData
 {
     QVector3D position;
@@ -81,6 +82,7 @@ public:
         std::vector<int> v(baseIndex);
         return v;}
     boundingBox getBBox();
+
 private:
 
     ////Methods
