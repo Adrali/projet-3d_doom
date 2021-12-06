@@ -4,6 +4,7 @@ TEMPLATE = app
 
 SOURCES += main.cpp \
     boundingbox.cpp \
+    camera.cpp \
     gameobject.cpp \
     player.cpp \
     transformation.cpp \
@@ -15,6 +16,7 @@ SOURCES += \
 
 HEADERS += \
     boundingbox.h \
+    camera.h \
     gameobject.h \
     mainwidget.h \
     geometryengine.h \

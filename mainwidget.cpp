@@ -107,35 +107,59 @@ void MainWidget::timerEvent(QTimerEvent *)
     float tValue = 2.0f;
     if(keys[Qt::Key_Z])
     {
-        projection.translate(0,-tValue,0);
+        //projection.translate(0,-tValue,0);
+        player->goForward();
     }
     else if(keys[Qt::Key_S])
     {
-        projection.translate(0,tValue,0);
+        //projection.translate(0,tValue,0);
+        player->goBackward();
+
     }
     if(keys[Qt::Key_Q])
     {
-        projection.translate(tValue,0,0);
+        //projection.translate(tValue,0,0);
+        player->goLeft();
+
     }
     else if(keys[Qt::Key_D])
     {
-        projection.translate(-tValue,0,0);
+        //projection.translate(-tValue,0,0);
+        player->goRight();
+
     }
     if(keys[Qt::Key_Up])
     {
         projection.translate(0,0,tValue);
+
     }
     else if(keys[Qt::Key_Down])
     {
         projection.translate(0,0,-tValue);
     }
+    if(keys[Qt::Key_Left])
+    {
+        //projection.translate(0,0,tValue);
+        player->turnLeft();
+
+    }
+    else if(keys[Qt::Key_Right])
+    {
+        //projection.translate(0,0,-tValue);
+        player->turnRight();
+
+    }
+    player->actualisePosition();
+    //Recalcul de la caméra
+    //camera->actualiseMatrix();
+
     update();
 }
 //! [1]
 
 void MainWidget::initializeGL()
 {
-    QFile infile("E:\\Master\\M2\\DOOM\\projet-3d_doom\\map.txt");
+    QFile infile("H:\\v2\\map.txt");
 
     transformation t;
     TypeMesh typeOfObject;
@@ -158,20 +182,24 @@ void MainWidget::initializeGL()
     //Graphe de scène
 
     GeometryEngine * mesh;
+
     cubeGeometries = new GeometryEngine;
     cubeGeometries->initCubeGeometry();
     planGeometries = new GeometryEngine;
     planGeometries->initPlanGeometry();
+
+
     root = new gameobject(nullptr,transformation(),0);
     map = new gameobject(nullptr,transformation(),0);
     entities = new gameobject(nullptr,transformation(),0);
+
     root->addChild(map);
     root->addChild(entities);
 
 
     t = transformation();
-    t.addTranslation(0,10,0);
-    player = new Player(cubeGeometries,t,1);
+    t.addTranslation(0,100,-40);
+    player = new Player(cubeGeometries,t,1,map);
     entities->addChild(player);
 
     //////////
@@ -181,6 +209,8 @@ void MainWidget::initializeGL()
         QMessageBox::information(0, "error", infile.errorString());
     }
     QTextStream in(&infile);
+
+
 
     while (!in.atEnd())
     {
@@ -211,31 +241,26 @@ void MainWidget::initializeGL()
                         break;
             }
             t = transformation();
-            t.addScale(sx,sy,sz);
+            t.addTranslation(tx,ty,tz);
 
             t.addRotationX(rx);
             t.addRotationY(ry);
             t.addRotationZ(rz);
-            t.addTranslation(tx,ty,tz);
+            t.addScale(sx,sy,sz);
 
             //appliquer les nouvelles transformations à t
             gameobject * go = new gameobject(mesh,t,idTexture);
-            /*qDebug() <<"\tTransforms : " << tx << " " << ty <<" " << tz <<endl;
-            qDebug() << "\tRotations : " << rx << " " << ry << " " << rz << endl;
-            qDebug() << "\tScale " << sx << " " << sy << " " << sz << endl;*/
             boundingBox bb = go->getBBox();
             qDebug() <<"\tTransforms : " << bb.getMinVertex() << " " << bb.getMaxVertex() << "" << go->getBarycentre() <<endl;
 
-            if(go->getBBox().isOverBoundingBox(player->getBarycentre())){
-
-
-                triangle cTriangle = go->getClosestTriangle(player->getBarycentre());
-                qDebug() << cTriangle.getT1() << cTriangle.getT2() << cTriangle.getT3() << Qt::endl;
-            }
             map->addChild(go);
         }
 
     }
+
+
+
+
     infile.close();
     // Use QBasicTimer because its faster than QTimer
     timer.start(12, this);
@@ -285,9 +310,11 @@ void MainWidget::resizeGL(int w, int h)
 {
     // Calculate aspect ratio
     qreal aspect = qreal(w) / qreal(h ? h : 1);
+    /*camera = new Camera(aspect);
+    camera->associatePlayer(player);*/
+    const qreal zNear = 2.0, zFar = 600.0, fov = 45.0;
 
     // Set near plane to 3.0, far plane to 7.0, field of view 45 degrees
-    const qreal zNear = 2.0, zFar = 600.0, fov = 45.0;
 
     // Reset projection
     projection.setToIdentity();
@@ -312,6 +339,7 @@ void MainWidget::paintGL()
 
     // Set modelview-projection matrix
     program.setUniformValue("mvp_matrix", projection * matrix);
+    //program.setUniformValue("mvp_matrix", camera->getProjectionMatrix() * matrix);
 //! [6]
 
     // Use texture unit 0 which contains cube.png

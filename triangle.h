@@ -12,6 +12,7 @@ private:
 public :
     triangle(QVector3D t1_,QVector3D t2_,QVector3D t3_);
     double hauteurPoint(QVector3D v);
+
     QVector3D getT1() const{
         return t1;
     }

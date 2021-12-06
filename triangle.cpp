@@ -51,7 +51,7 @@ bool triangle::PointInTriangle(QVector3D p) {
 double triangle::hauteurPoint(QVector3D v){
     QVector4D plan(normal,0.0);
     plan[3] = -(plan.x()*t1.x()+plan.y()*t1.y()+plan.z()*t1.z());
-    float t=plan[0]*v.x()+plan[1]*v.y()+plan[2]*v.z()+plan[3];
+    float t=(plan[0]*v.x()+plan[1]*v.y()+plan[2]*v.z()+plan[3])/plan[1];
     QVector3D newPoint = v + t*QVector3D(0,-1,0);
     if(PointInTriangle(newPoint))
         return t;

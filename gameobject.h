@@ -33,8 +33,9 @@ public :
     std::vector<int> getActualIndexs(){return mesh->getIndex();}
     boundingBox getBBox();
     QVector3D getBarycentre();
-
-    triangle getClosestTriangle(QVector3D p);
+    transformation getTransform(){ return transformation(transform);}
+    triangle getClosestTriangleDown(QVector3D p);
+    triangle getClosestTriangleDown(QVector3D p,double & distance);
 
     //Debug methods
     void displayBaseValue(){
@@ -48,7 +49,7 @@ public :
 
 
 
-private:
+protected:
     ////Variables
     GeometryEngine * mesh;
     transformation transform;

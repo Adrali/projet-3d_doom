@@ -55,6 +55,8 @@
 #include "gameobject.h"
 #include "transformation.h"
 #include "player.h"
+#include "camera.h"
+
 #include <QOpenGLWidget>
 #include <QOpenGLFunctions_3_1>
 #include <QMatrix4x4>
@@ -112,7 +114,6 @@ private:
     gameobject * map;
     gameobject * entities;
     Player * player;
-
     //Textures
     QOpenGLTexture *texture;
 
@@ -123,6 +124,7 @@ private:
     QVector3D rotationAxis;
     qreal angularSpeed;
     QQuaternion rotation;
+    Camera * camera;
 
 };
 
