@@ -10,11 +10,12 @@ private :
     float x,y,z;
     float nx,ny,nz;
     float anglePlayer = 0;
-    float speed = 0.5f;
-    float backwardSpeed = 0.7f;
-    float angularSpeed = 1.0f;
-    float hauteurSol = 10.0f;
+    const float speed = 0.5f;
+    const float backwardSpeed = 0.7f;
+    const float angularSpeed = 1.0f;
+    const float hauteurSol = 10.0f;
     gameobject * map;
+    const float vitesseChuteMax = 0.5f;
 public:
     Player() : gameobject(){};
     Player(GeometryEngine * m,transformation t, int id_texture, gameobject * _map) : gameobject(m,t,id_texture),map(_map){
@@ -74,9 +75,12 @@ public:
             }
 
         }
-        if(y < std::numeric_limits<double>::infinity())
-            y = y - minDistance + hauteurSol;
-
+        if(y < std::numeric_limits<double>::infinity()){
+            float delta = minDistance - hauteurSol;
+            if(vitesseChuteMax < (minDistance - hauteurSol))
+                delta = vitesseChuteMax;
+            y = y - delta;
+        }
         t.addTranslation(x,y,z);
         t.addRotationY(anglePlayer);
         qInfo() << x << " " << y << " " << z << endl;
