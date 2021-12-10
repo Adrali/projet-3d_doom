@@ -1,8 +1,10 @@
 #include "gameobject.h"
 
 gameobject::gameobject(){}
+
+
 void gameobject::displayObject(QMatrix4x4 parentTransform, QOpenGLShaderProgram *program,QMatrix4x4 projection){
-    if(mesh){
+    if(mesh && isDisplaying){
         program->setUniformValue("mvp_matrix", projection * parentTransform * transform.getTransformationMatrix());
         mesh->drawGeometry(program);
     }

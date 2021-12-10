@@ -25,6 +25,7 @@ HEADERS += \
     triangle.h
 
 RESOURCES += \
+    maps.qrc \
     shaders.qrc \
     textures.qrc
 
@@ -33,5 +34,4 @@ target.path = $$[YOUR_PATH]
 INSTALLS += target
 
 DISTFILES += \
-    ../sound/fire.wav \
-    map.txt
+    ../sound/fire.wav

@@ -95,6 +95,8 @@ protected:
     void initializeGL() override;
     void resizeGL(int w, int h) override;
     void paintGL() override;
+    void mainLoop();
+    void parsingMapFile();
 
     void initShaders();
     void initTextures();
@@ -117,14 +119,11 @@ private:
     //Textures
     QOpenGLTexture *texture;
 
-    //Sounds
-    //QSound shootSFX("/home/e20200007675/M2_IMAGINE/Projet_Moteur_Jeux/sound/fire.wav");
-    QMatrix4x4 projection;
-    QVector2D mousePressPosition;
-    QVector3D rotationAxis;
-    qreal angularSpeed;
-    QQuaternion rotation;
+    //Cameras
     Camera * camera;
+
+    //gameBooleans
+    bool isPause = false;
 
 };
 

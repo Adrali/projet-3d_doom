@@ -60,8 +60,7 @@ MainWidget::MainWidget(QWidget *parent) :
     QOpenGLWidget(parent),
     cubeGeometries(0),
     planGeometries(0),
-    texture(0),
-    angularSpeed(0)
+    texture(0)
 {
 }
 
@@ -92,6 +91,9 @@ void MainWidget::keyReleaseEvent(QKeyEvent *event)
 void MainWidget::keyPressEvent(QKeyEvent *event)
 {
     keys[event->key()] = true;
+    if(event->key() == Qt::Key_P){
+        isPause = !isPause;
+    }
     QWidget::keyPressEvent(event);
 }
 
@@ -99,73 +101,20 @@ void MainWidget::mouseReleaseEvent(QMouseEvent *e)
 {
 
 }
-//! [0]
 
-//! [1]
 void MainWidget::timerEvent(QTimerEvent *)
 {
-    float tValue = 2.0f;
-    if(keys[Qt::Key_Z])
-    {
-        //projection.translate(0,-tValue,0);
-        player->goForward();
-    }
-    else if(keys[Qt::Key_S])
-    {
-        //projection.translate(0,tValue,0);
-        player->goBackward();
 
-    }
-    if(keys[Qt::Key_Q])
-    {
-        //projection.translate(tValue,0,0);
-        player->goLeft();
-
-    }
-    else if(keys[Qt::Key_D])
-    {
-        //projection.translate(-tValue,0,0);
-        player->goRight();
-
-    }
-    if(keys[Qt::Key_Up])
-    {
-        projection.translate(0,0,tValue);
-
-    }
-    else if(keys[Qt::Key_Down])
-    {
-        projection.translate(0,0,-tValue);
-    }
-    if(keys[Qt::Key_Left])
-    {
-        //projection.translate(0,0,tValue);
-        player->turnLeft();
-
-    }
-    else if(keys[Qt::Key_Right])
-    {
-        //projection.translate(0,0,-tValue);
-        player->turnRight();
-
-    }
-    player->actualisePosition();
     //Recalcul de la caméra
     //camera->actualiseMatrix();
-
+    mainLoop();
     update();
 }
-//! [1]
 
 void MainWidget::initializeGL()
 {
-    QFile infile("H:\\v2\\map.txt");
 
     transformation t;
-    TypeMesh typeOfObject;
-    int valueOfObject,idTexture;
-    double tx, ty, tz, rx, ry, rz, sx, sy, sz;
-
     initializeOpenGLFunctions();
 
     glClearColor(0, 0, 0, 1);
@@ -181,7 +130,6 @@ void MainWidget::initializeGL()
 //! [2]
     //Graphe de scène
 
-    GeometryEngine * mesh;
 
     cubeGeometries = new GeometryEngine;
     cubeGeometries->initCubeGeometry();
@@ -202,9 +150,101 @@ void MainWidget::initializeGL()
     player = new Player(cubeGeometries,t,1,map);
     entities->addChild(player);
 
+    parsingMapFile();
+    // Use QBasicTimer because its faster than QTimer
+    timer.start(12, this);
+}
+
+//! [3]
+void MainWidget::initShaders()
+{
+    // Compile vertex shader
+    if (!program.addShaderFromSourceFile(QOpenGLShader::Vertex, ":/vshader.glsl"))
+        close();
+
+    // Compile fragment shader
+    if (!program.addShaderFromSourceFile(QOpenGLShader::Fragment, ":/fshader.glsl"))
+        close();
+
+    // Link shader pipeline
+    if (!program.link())
+        close();
+
+    // Bind shader pipeline for use
+    if (!program.bind())
+        close();
+}
+//! [3]
+
+//! [4]
+void MainWidget::initTextures()
+{
+    // Load cube.png image
+    texture = new QOpenGLTexture(QImage(":/cube.png").mirrored());
+
+    // Set nearest filtering mode for texture minification
+    texture->setMinificationFilter(QOpenGLTexture::Nearest);
+
+    // Set bilinear filtering mode for texture magnification
+    texture->setMagnificationFilter(QOpenGLTexture::Linear);
+
+    // Wrap texture coordinates by repeating
+    // f.ex. texture coordinate (1.1, 1.2) is same as (0.1, 0.2)
+    texture->setWrapMode(QOpenGLTexture::Repeat);
+}
+//! [4]
+
+//! [5]
+void MainWidget::resizeGL(int w, int h)
+{
+    // Calculate aspect ratio
+    qreal aspect = qreal(w) / qreal(h ? h : 1);
+    // Set near plane to 3.0, far plane to 7.0, field of view 45 degrees
+    const qreal zNear = 2.0, zFar = 600.0, fov = 45.0;
+
+
+    // Reset projection
+    QMatrix4x4 projection;
+    projection.setToIdentity();
+
+    // Set perspective projection
+    projection.perspective(fov, aspect, zNear, zFar);
+
+    camera = new Camera(QMatrix4x4(projection));
+    camera->associatePlayer(player);
+}
+//! [5]
+
+void MainWidget::paintGL()
+{
+    // Clear color and depth buffer
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    texture->bind();
+
+//! [6]
+    QMatrix4x4 vueMatrix = camera->getVueMatrix();
+    QMatrix4x4 projectionMatrix = camera->getProjectionMatrix();
+
+    program.setUniformValue("mvp_matrix", projectionMatrix * vueMatrix);
+
+    //Affichage du graphe de scène
+    root->displayAll(&program, projectionMatrix * vueMatrix);
+}
+
+
+void MainWidget::parsingMapFile(){
     //////////
     /// Parsing de fichier
     /////////
+    QFile infile(":/map.txt");
+
+    TypeMesh typeOfObject;
+    int valueOfObject,idTexture;
+    double tx, ty, tz, rx, ry, rz, sx, sy, sz;
+
+    transformation t;
+    GeometryEngine * mesh;
     if(!infile.open(QIODevice::ReadOnly)) {
         QMessageBox::information(0, "error", infile.errorString());
     }
@@ -262,90 +302,37 @@ void MainWidget::initializeGL()
 
 
     infile.close();
-    // Use QBasicTimer because its faster than QTimer
-    timer.start(12, this);
 }
 
-//! [3]
-void MainWidget::initShaders()
-{
-    // Compile vertex shader
-    if (!program.addShaderFromSourceFile(QOpenGLShader::Vertex, ":/vshader.glsl"))
-        close();
+void MainWidget::mainLoop(){
+    if(!isPause){
+        //Inputs Joueur
+        if(keys[Qt::Key_Z])
+        {
+            player->goForward();
+        }
+        else if(keys[Qt::Key_S])
+        {
+            player->goBackward();
+        }
+        if(keys[Qt::Key_Q])
+        {
+            player->goLeft();
+        }
+        else if(keys[Qt::Key_D])
+        {
+            player->goRight();
+        }
+        if(keys[Qt::Key_Left])
+        {
+            player->turnLeft();
+        }
+        else if(keys[Qt::Key_Right])
+        {
+            player->turnRight();
+        }
+        player->actualisePosition();
+        camera->actualiseVueMatrix();
+    }
 
-    // Compile fragment shader
-    if (!program.addShaderFromSourceFile(QOpenGLShader::Fragment, ":/fshader.glsl"))
-        close();
-
-    // Link shader pipeline
-    if (!program.link())
-        close();
-
-    // Bind shader pipeline for use
-    if (!program.bind())
-        close();
-}
-//! [3]
-
-//! [4]
-void MainWidget::initTextures()
-{
-    // Load cube.png image
-    texture = new QOpenGLTexture(QImage(":/cube.png").mirrored());
-
-    // Set nearest filtering mode for texture minification
-    texture->setMinificationFilter(QOpenGLTexture::Nearest);
-
-    // Set bilinear filtering mode for texture magnification
-    texture->setMagnificationFilter(QOpenGLTexture::Linear);
-
-    // Wrap texture coordinates by repeating
-    // f.ex. texture coordinate (1.1, 1.2) is same as (0.1, 0.2)
-    texture->setWrapMode(QOpenGLTexture::Repeat);
-}
-//! [4]
-
-//! [5]
-void MainWidget::resizeGL(int w, int h)
-{
-    // Calculate aspect ratio
-    qreal aspect = qreal(w) / qreal(h ? h : 1);
-    /*camera = new Camera(aspect);
-    camera->associatePlayer(player);*/
-    const qreal zNear = 2.0, zFar = 600.0, fov = 45.0;
-
-    // Set near plane to 3.0, far plane to 7.0, field of view 45 degrees
-
-    // Reset projection
-    projection.setToIdentity();
-
-    // Set perspective projection
-    projection.perspective(fov, aspect, zNear, zFar);
-}
-//! [5]
-
-void MainWidget::paintGL()
-{
-    // Clear color and depth buffer
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    texture->bind();
-
-//! [6]
-    // Calculate model view transformation
-    QMatrix4x4 matrix;
-    matrix.translate(0.0, 0.0, -5.0);
-    matrix.rotate(rotation);
-
-    // Set modelview-projection matrix
-    program.setUniformValue("mvp_matrix", projection * matrix);
-    //program.setUniformValue("mvp_matrix", camera->getProjectionMatrix() * matrix);
-//! [6]
-
-    // Use texture unit 0 which contains cube.png
-    //program.setUniformValue("texture", 0);
-
-    // Draw cube geometry
-    //geometries->drawCubeGeometry(&program);
-    root->displayAll(&program,projection);
 }

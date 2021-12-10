@@ -27,7 +27,9 @@ public :
     void displayAll(QOpenGLShaderProgram *program,QMatrix4x4 projection);
     void addChild(gameobject * g){childs.push_back(g);}
     std::vector<gameobject *> getChilds(){return childs;}
-      //Getters
+
+
+    //Getters
     int getIdTexture(){return idTexture;}
     std::vector<QVector3D> getActualVertices();
     std::vector<int> getActualIndexs(){return mesh->getIndex();}
@@ -52,6 +54,7 @@ public :
 protected:
     ////Variables
     GeometryEngine * mesh;
+    bool isDisplaying = true;
     transformation transform;
     std::vector<gameobject *> childs;
     int idTexture;

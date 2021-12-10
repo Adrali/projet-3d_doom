@@ -10,15 +10,16 @@ private :
     float x,y,z;
     float nx,ny,nz;
     float anglePlayer = 0;
-    const float speed = 0.5f;
+    const float speed = 1.0f;
     const float backwardSpeed = 0.7f;
-    const float angularSpeed = 1.0f;
+    const float angularSpeed = 5.0f;
     const float hauteurSol = 10.0f;
     gameobject * map;
     const float vitesseChuteMax = 0.5f;
 public:
     Player() : gameobject(){};
     Player(GeometryEngine * m,transformation t, int id_texture, gameobject * _map) : gameobject(m,t,id_texture),map(_map){
+        isDisplaying = true;
         QVector3D barycentre = getBarycentre();
         nx = x = barycentre.x();
         ny = y = barycentre.y();
@@ -26,9 +27,6 @@ public:
 
     };
 
-    void displayObject(QMatrix4x4 parentTransform, QOpenGLShaderProgram *program,QMatrix4x4 projection){
-
-    }
     //Movement methods
     void goForward(){
         nz-=cos(M_PI * anglePlayer / 180.0)*speed;
@@ -54,39 +52,14 @@ public:
 
     //Getters
     QVector3D getPlayerPosition(){return QVector3D(x,y,z);}
+    float getPlayerAngle(){return anglePlayer;}
+
+    //DisplayMethods
 
     //Main methods
-    void actualisePosition(){
-        transformation t;
-        x = nx;
-        z = nz;
-        QVector3D newPoint(x,y,z);
-        double minDistance = std::numeric_limits<double>::infinity();
-        for(gameobject * go : map->getChilds()){
-            if(go->getBBox().isOverBoundingBox(newPoint)){
-                double actDistance;
-                triangle actTriangle = go->getClosestTriangleDown(newPoint);
-                actDistance = actTriangle.hauteurPoint(newPoint);
-                qInfo() << actDistance << endl;
+    void actualisePosition();
 
-                if(actDistance < minDistance){
-                    minDistance = actDistance;
-                }
-            }
 
-        }
-        if(y < std::numeric_limits<double>::infinity()){
-            float delta = minDistance - hauteurSol;
-            if(vitesseChuteMax < (minDistance - hauteurSol))
-                delta = vitesseChuteMax;
-            y = y - delta;
-        }
-        t.addTranslation(x,y,z);
-        t.addRotationY(anglePlayer);
-        qInfo() << x << " " << y << " " << z << endl;
-        this->setTransform(t);
-    }
 
 };
-
 #endif // PLAYER_H
