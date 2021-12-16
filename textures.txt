@@ -1,0 +1,4 @@
+##
+#Liste path des textures
+:/textures/Heightmap_Mountain.png
+:/textures/silver-diamond-plate.jpg

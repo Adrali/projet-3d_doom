@@ -2,6 +2,7 @@
 #define GAMEOBJECT_H
 #include <geometryengine.h>
 #include <transformation.h>
+#include <QOpenGLTexture>
 #include <vector>
 #include "boundingbox.h"
 
@@ -13,7 +14,7 @@ class gameobject
 public :
     ////Constructors
     gameobject();
-    gameobject(GeometryEngine * m,transformation t, int id_texture) : mesh(m), transform(t),idTexture(id_texture){
+    gameobject(GeometryEngine * m,transformation t, QOpenGLTexture * texture_) : mesh(m), transform(t),texture(texture_){
 
     }
 
@@ -27,14 +28,16 @@ public :
     void displayAll(QOpenGLShaderProgram *program,QMatrix4x4 projection);
     void addChild(gameobject * g){childs.push_back(g);}
     std::vector<gameobject *> getChilds(){return childs;}
-      //Getters
-    int getIdTexture(){return idTexture;}
+
+
+    //Getters
     std::vector<QVector3D> getActualVertices();
     std::vector<int> getActualIndexs(){return mesh->getIndex();}
     boundingBox getBBox();
     QVector3D getBarycentre();
-
-    triangle getClosestTriangle(QVector3D p);
+    transformation getTransform(){ return transformation(transform);}
+    triangle getClosestTriangleDown(QVector3D p);
+    triangle getClosestTriangleDown(QVector3D p,double & distance);
 
     //Debug methods
     void displayBaseValue(){
@@ -48,12 +51,14 @@ public :
 
 
 
-private:
+protected:
     ////Variables
+    QOpenGLTexture * texture;
     GeometryEngine * mesh;
+    bool isDisplaying = true;
     transformation transform;
     std::vector<gameobject *> childs;
-    int idTexture;
+
 };
 #endif
 

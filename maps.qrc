@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/">
+        <file>map.txt</file>
+        <file>textures.txt</file>
+    </qresource>
+</RCC>

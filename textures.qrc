@@ -1,5 +1,12 @@
 <RCC>
     <qresource prefix="/">
-        <file>cube.png</file>
+        <file>textures/cube.png</file>
+        <file>textures/grass.png</file>
+        <file>textures/Heightmap_Mountain.png</file>
+        <file>textures/Heightmap_Rocky.png</file>
+        <file>textures/heightmap-1024x1024.png</file>
+        <file>textures/rock.png</file>
+        <file>textures/silver-diamond-plate.jpg</file>
+        <file>textures/snowrocks.png</file>
     </qresource>
 </RCC>

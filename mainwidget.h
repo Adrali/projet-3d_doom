@@ -55,6 +55,8 @@
 #include "gameobject.h"
 #include "transformation.h"
 #include "player.h"
+#include "camera.h"
+
 #include <QOpenGLWidget>
 #include <QOpenGLFunctions_3_1>
 #include <QMatrix4x4>
@@ -93,7 +95,9 @@ protected:
     void initializeGL() override;
     void resizeGL(int w, int h) override;
     void paintGL() override;
-
+    void mainLoop();
+    void parsingMapFile();
+    void parsingTextureFile();
     void initShaders();
     void initTextures();
 
@@ -112,17 +116,14 @@ private:
     gameobject * map;
     gameobject * entities;
     Player * player;
-
     //Textures
-    QOpenGLTexture *texture;
+    QOpenGLTexture *defaultTexture;
+    std::vector<QOpenGLTexture *> lTextures;
+    //Cameras
+    Camera * camera;
 
-    //Sounds
-    //QSound shootSFX("/home/e20200007675/M2_IMAGINE/Projet_Moteur_Jeux/sound/fire.wav");
-    QMatrix4x4 projection;
-    QVector2D mousePressPosition;
-    QVector3D rotationAxis;
-    qreal angularSpeed;
-    QQuaternion rotation;
+    //gameBooleans
+    bool isPause = false;
 
 };
 

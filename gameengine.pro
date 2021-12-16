@@ -4,6 +4,7 @@ TEMPLATE = app
 
 SOURCES += main.cpp \
     boundingbox.cpp \
+    camera.cpp \
     gameobject.cpp \
     player.cpp \
     transformation.cpp \
@@ -15,6 +16,7 @@ SOURCES += \
 
 HEADERS += \
     boundingbox.h \
+    camera.h \
     gameobject.h \
     mainwidget.h \
     geometryengine.h \
@@ -23,6 +25,7 @@ HEADERS += \
     triangle.h
 
 RESOURCES += \
+    maps.qrc \
     shaders.qrc \
     textures.qrc
 
@@ -31,5 +34,4 @@ target.path = $$[YOUR_PATH]
 INSTALLS += target
 
 DISTFILES += \
-    ../sound/fire.wav \
-    map.txt
+    ../sound/fire.wav
