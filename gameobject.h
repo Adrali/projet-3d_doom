@@ -6,12 +6,11 @@
 #include <vector>
 #include "boundingbox.h"
 
-/*!
- * \file gameobject.h
- * \brief Représente un gameobject, celui ci est composé d'un mesh, d'une transformation et d'une texture
- * \author Pierre.L
- * \version 0.1
- * \date 10 dec 2021
+/**
+ * @brief Représente un gameobject, celui ci est composé d'un mesh, d'une transformation et d'une texture
+ * @author Pierre.L
+ * @version 0.1
+ * @date 10 dec 2021
  *
  * Header de la classe gameobject
  *

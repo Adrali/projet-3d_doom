@@ -4,12 +4,11 @@
 #include <QMatrix4x4>
 #include <player.h>
 
-/*!
- * \file camera.h
- * \brief Représente une camera avec ses différentes matrices
- * \author Pierre.L
- * \version 0.1
- * \date 10 dec 2021
+/**
+ * @brief Représente une camera avec ses différentes matrices
+ * @author Pierre.L
+ * @version 0.1
+ * @date 10 dec 2021
  *
  * Header de la classe Camera
  *

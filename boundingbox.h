@@ -3,12 +3,11 @@
 #include <QVector3D>
 #include <vector>
 
-/*!
- * \file boundingbox.h
- * \brief Représente une bounding box avec un point contenant les coordonées minimales de l'objet et un point représentant les coordonées maximales
- * \author Pierre.L
- * \version 0.1
- * \date 10 dec 2021
+/**
+ * @brief Représente une bounding box avec un point contenant les coordonées minimales de l'objet et un point représentant les coordonées maximales
+ * @author Pierre.L
+ * @version 0.1
+ * @date 10 dec 2021
  *
  * Header de la classe boundingBox
  *
