@@ -24,22 +24,69 @@ private :
    qreal aspect;
 
 public :
-   Camera();
+   /*!
+    *  \brief Constructeur de la classe Camera
+    *
+    *  Construit une caméra avec une matrice de projection identité
+    *
+    */
+   Camera(){
+       projection.setToIdentity();
+       vue.setToIdentity();
+   };
+
+   /*!
+    *  \brief Constructeur de la classe Camera
+    *
+    *
+    */
    Camera(QMatrix4x4 projection_) : projection(projection_){
        vue.setToIdentity();
    }
+
+   /*!
+    *  \brief Actualise la matrice de vue en fonction de la position du joueur
+    */
    void actualiseVueMatrix();
-   void associatePlayer(Player * p_){
-       p = p_;
+
+   /*!
+    *  \brief Associe un joueur à suivre la caméra
+    *
+    *  \param player_ : Pointeur vers le joueur à suivre
+    */
+   void associatePlayer(Player * player_){
+       p = player_;
    }
 
+   /*!
+    *  \brief Associe une matrice de projection à la caméra
+    *
+    *  \param projection_ : Matrice de projection de la scène
+    */
+   void setProjectionMatrix(QMatrix4x4 projection_){
+       projection = projection_;
+   }
+
+   /*!
+    *  \brief Retourne la matrice de vue actuelle de la caméra
+    */
    QMatrix4x4 getVueMatrix(){
        return QMatrix4x4(vue);
    }
+
+   /*!
+    *  \brief Retourne la matrice de projection de la caméra
+    */
    QMatrix4x4 getProjectionMatrix(){
        return QMatrix4x4(projection);
    }
 
+   /*!
+    *  \brief Retourne la matrice MVP de la caméra
+    */
+   QMatrix4x4 getMVPMatrix(){
+       return QMatrix4x4(projection * vue);
+   }
 };
 
 #endif // CAMERA_H

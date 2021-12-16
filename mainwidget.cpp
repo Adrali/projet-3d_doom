@@ -222,14 +222,10 @@ void MainWidget::paintGL()
 
     //texture->bind();
 
-//! [6]
-    QMatrix4x4 vueMatrix = camera->getVueMatrix();
-    QMatrix4x4 projectionMatrix = camera->getProjectionMatrix();
-
-    program.setUniformValue("mvp_matrix", projectionMatrix * vueMatrix);
+    program.setUniformValue("mvp_matrix", camera->getMVPMatrix());
 
     //Affichage du graphe de scène
-    root->displayAll(&program, projectionMatrix * vueMatrix);
+    root->displayAll(&program, camera->getMVPMatrix());
 }
 
 
