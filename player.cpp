@@ -37,3 +37,20 @@ void Player::actualisePosition(){
 }
 
 
+void Player::turnLeft(float power){
+    power = std::min(power,1.0f);
+    power = std::max(0.0f,power);
+    anglePlayer+=power*angularSpeed;
+}
+void Player::turnRight(float power){
+    power = std::min(power,1.0f);
+    power = std::max(0.0f,power);
+    anglePlayer-=power*angularSpeed;
+}
+
+void Player::turnPlayer(float power){
+    if(power < 0)
+        turnRight(-power);
+    else if (power > 0)
+        turnLeft(power);
+}

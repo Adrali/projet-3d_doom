@@ -54,7 +54,7 @@
 #include <QKeyEvent>
 #include <math.h>
 #include <QVector3D>
-
+#include <QApplication>
 
 MainWidget::MainWidget(QWidget *parent) :
     QOpenGLWidget(parent),
@@ -62,6 +62,7 @@ MainWidget::MainWidget(QWidget *parent) :
     planGeometries(0),
     defaultTexture(0)
 {
+    setMouseTracking(true);
 }
 
 MainWidget::~MainWidget()
@@ -75,10 +76,11 @@ MainWidget::~MainWidget()
     doneCurrent();
 }
 
+
+
 //! [0]
 void MainWidget::mousePressEvent(QMouseEvent *e)
 {
-
 }
 
 
@@ -93,6 +95,10 @@ void MainWidget::keyPressEvent(QKeyEvent *event)
     keys[event->key()] = true;
     if(event->key() == Qt::Key_P){
         isPause = !isPause;
+    }
+    else if(event->key() == Qt::Key_Escape)
+    {
+         QCoreApplication::quit();
     }
     QWidget::keyPressEvent(event);
 }
@@ -109,6 +115,25 @@ void MainWidget::timerEvent(QTimerEvent *)
     //camera->actualiseMatrix();
     mainLoop();
     update();
+}
+
+void MainWidget::mouseMoveEvent(QMouseEvent* event){
+    const int maxDeltaX = 30;
+
+    //Calcul de la différence entre la dernière pos de la souris et maintenant
+    int deltax = width()/2-event->pos().x();
+    int deltay = height()/2 - event->pos().y();
+
+    //On restraint la valeur du delta
+    deltax = std::max(deltax,-maxDeltaX);
+    deltax = std::min(deltax,maxDeltaX);
+    /*qInfo() << "X:" <<deltax;
+    qInfo() << "Y:" <<deltay;*/
+    //On tourne le joueur
+    player->turnPlayer(deltax/(maxDeltaX*1.0));
+
+    QPoint glob = mapToGlobal(QPoint(width()/2,height()/2));
+    QCursor::setPos(glob);
 }
 
 void MainWidget::initializeGL()

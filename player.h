@@ -2,7 +2,7 @@
 #define PLAYER_H
 #include "gameobject.h"
 #include "triangle.h"
-
+#include <algorithm>
 #include <cmath>
 class Player : public gameobject
 {
@@ -13,7 +13,7 @@ private :
     const float speed = 1.0f;
     const float backwardSpeed = 0.7f;
     const float angularSpeed = 5.0f;
-    const float hauteurSol = 10.0f;
+    const float hauteurSol = 40.0f;
     gameobject * map;
     const float vitesseChuteMax = 0.5f;
 public:
@@ -46,6 +46,14 @@ public:
     }
     void turnLeft(){anglePlayer+=angularSpeed;}
     void turnRight(){anglePlayer-=angularSpeed;}
+
+    void turnLeft(float power);
+    void turnRight(float power);
+    /**
+     * @brief turn the player with a certains power (-1<=power<=1)
+     * @param power : if power = 0, the player dont turn, if -1<=power<0, the player turn to the left with maxRotationSpeed at -1, if 0<power<=1, the player turn to the right with maxRotationSpeed at 1
+     */
+    void turnPlayer(float power);
 
     //Predicates
     bool isPositionLegit(QVector3D newPos);

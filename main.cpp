@@ -66,12 +66,16 @@ int main(int argc, char *argv[])
 
     app.setApplicationName("TP1 et 2");
     app.setApplicationVersion("0.1");
+
+
 #ifndef QT_NO_OPENGL
     MainWidget widget;
+
     widget.show();
 #else
     QLabel note("OpenGL Support required");
     note.show();
 #endif
+
     return app.exec();
 }

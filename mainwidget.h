@@ -73,7 +73,7 @@
 #include <fstream>
 #include <string>
 #include <sstream>
-
+#include <algorithm>
 class GeometryEngine;
 
 enum TypeMesh {PLAN,CUBE,SPHERE,OBJECT};
@@ -100,7 +100,7 @@ protected:
     void parsingTextureFile();
     void initShaders();
     void initTextures();
-
+    void mouseMoveEvent(QMouseEvent* event);
 
 private:
     QTimer *timers;
@@ -121,7 +121,6 @@ private:
     std::vector<QOpenGLTexture *> lTextures;
     //Cameras
     Camera * camera;
-
     //gameBooleans
     bool isPause = false;
 
