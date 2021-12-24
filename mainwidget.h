@@ -101,6 +101,7 @@ protected:
     void initShaders();
     void initTextures();
     void mouseMoveEvent(QMouseEvent* event);
+    void on_action_Fullscreen_triggered();
 
 private:
     QTimer *timers;
@@ -123,6 +124,7 @@ private:
     Camera * camera;
     //gameBooleans
     bool isPause = false;
+    bool isMouseForward = false;
 
 };
 

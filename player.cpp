@@ -48,6 +48,26 @@ void Player::turnRight(float power){
     anglePlayer-=power*angularSpeed;
 }
 
+
+void Player::goForward(float power){
+    power = std::min(power,1.0f);
+    power = std::max(0.0f,power);
+    nz-=cos(M_PI * anglePlayer / 180.0)*speed;
+    nx-=sin(M_PI * anglePlayer / 180.0)*speed;
+}
+void Player::goBackward(float power){
+    power = std::min(power,1.0f);
+    power = std::max(0.0f,power);
+    nz+=cos(M_PI * anglePlayer / 180.0)*power*backwardSpeed;
+    nx+=sin(M_PI * anglePlayer / 180.0)*power*backwardSpeed;
+}
+
+void Player::movePlayer(float power){
+    if(power<0)
+        goBackward(-power);
+    else if(power>0)
+         goForward(power);
+}
 void Player::turnPlayer(float power){
     if(power < 0)
         turnRight(-power);

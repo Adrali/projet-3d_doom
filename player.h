@@ -49,11 +49,21 @@ public:
 
     void turnLeft(float power);
     void turnRight(float power);
+
+    void goForward(float power);
+    void goBackward(float power);
+
+
     /**
      * @brief turn the player with a certains power (-1<=power<=1)
      * @param power : if power = 0, the player dont turn, if -1<=power<0, the player turn to the left with maxRotationSpeed at -1, if 0<power<=1, the player turn to the right with maxRotationSpeed at 1
      */
     void turnPlayer(float power);
+    /**
+     * @brief move the player with a certains power (-1<=power<=1)
+     * @param power : if power = 0, the player dont turn, if -1<=power<0, the player go backward with maxSpeed at -1, if 0<power<=1, the playergo forward with maxSpeed at 1
+     */
+    void movePlayer(float power);
 
     //Predicates
     bool isPositionLegit(QVector3D newPos);

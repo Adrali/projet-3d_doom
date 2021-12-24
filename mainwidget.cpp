@@ -63,6 +63,9 @@ MainWidget::MainWidget(QWidget *parent) :
     defaultTexture(0)
 {
     setMouseTracking(true);
+    QCursor cursor(Qt::BlankCursor);
+    QApplication::setOverrideCursor(cursor);
+    QApplication::changeOverrideCursor(cursor);
 }
 
 MainWidget::~MainWidget()
@@ -96,6 +99,12 @@ void MainWidget::keyPressEvent(QKeyEvent *event)
     if(event->key() == Qt::Key_P){
         isPause = !isPause;
     }
+    else if(event->key() == Qt::Key_F){
+        isMouseForward = !isMouseForward;
+    }
+    else if(event->key() == Qt::Key_F11){
+        on_action_Fullscreen_triggered();
+    }
     else if(event->key() == Qt::Key_Escape)
     {
          QCoreApplication::quit();
@@ -119,6 +128,7 @@ void MainWidget::timerEvent(QTimerEvent *)
 
 void MainWidget::mouseMoveEvent(QMouseEvent* event){
     const int maxDeltaX = 30;
+    const int maxDeltaY = 30;
 
     //Calcul de la différence entre la dernière pos de la souris et maintenant
     int deltax = width()/2-event->pos().x();
@@ -127,10 +137,17 @@ void MainWidget::mouseMoveEvent(QMouseEvent* event){
     //On restraint la valeur du delta
     deltax = std::max(deltax,-maxDeltaX);
     deltax = std::min(deltax,maxDeltaX);
+
+    deltay = std::max(deltay,-maxDeltaY);
+    deltay = std::min(deltay,maxDeltaY);
     /*qInfo() << "X:" <<deltax;
     qInfo() << "Y:" <<deltay;*/
     //On tourne le joueur
     player->turnPlayer(deltax/(maxDeltaX*1.0));
+
+    if(isMouseForward){
+        player->movePlayer(deltay/(maxDeltaX*1.0));
+    }
 
     QPoint glob = mapToGlobal(QPoint(width()/2,height()/2));
     QCursor::setPos(glob);
@@ -409,4 +426,9 @@ void MainWidget::mainLoop(){
         camera->actualiseVueMatrix();
     }
 
+}
+
+void MainWidget::on_action_Fullscreen_triggered()
+{
+    isFullScreen() ? showNormal() : showFullScreen();
 }
