@@ -2,6 +2,12 @@
 #define TRANSFORMATION_H
 #include <QVector3D>
 #include <QMatrix4x4>
+#include <math.h>
+
+
+
+
+
 
 /**
  * @brief Représente une matrice de transformation. On peut lui appliquer diverses transformations supplémentaire et transformer des vecteurs
@@ -26,6 +32,14 @@ public:
     void addRotationZ(float angle){transform.rotate(angle,QVector3D(0,0,1));}
     void addTranslation(float tx, float ty, float tz){transform.translate(tx,ty,tz);}
     void addScale(float sx, float sy, float sz){transform.scale(sx,sy,sz);}
+
+
+    float angleBetweenVectors2D(QVector3D v1,QVector3D v2)
+    {
+        return atan2(v1.x()*v2.y()-v2.x()*v1.y(),v1.x()*v1.y()+v2.x()*v2.y());
+    }
 };
+
+
 
 #endif // TRANSFORMATION_H

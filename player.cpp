@@ -26,51 +26,40 @@ void Player::actualisePosition(){
             float delta = minDistance - hauteurSol;
             if(vitesseChuteMax < (minDistance - hauteurSol))
                 delta = vitesseChuteMax;
-            y = y - delta;
+            y = y - delta ;
         }
 
         //Actualise la pos du joueur
         t.addTranslation(x,y,z);
-        t.addRotationY(anglePlayer);
+        t.addRotationY(angleEntity);
+        t.addScale(1,1,1);
         //qInfo() << x << " " << y << " " << z << endl;
         this->setTransform(t);
 }
 
+void Player::shoot(std::vector<Ennemy * > _lEnnemy){
+    if(ammo[weapon] > 0){
+        double minDist = std::numeric_limits<double>::infinity();
+        Ennemy * closestEnnemy = nullptr;
+        if(_lEnnemy.size() > 0){
+            for(Ennemy * ennemy : _lEnnemy){
+                QVector2D forwardDir(sin(M_PI * angleEntity / 180.0),cos(M_PI * angleEntity / 180.0));
+                QVector2D ennemyDir(x-ennemy->getBarycentre().x(),z-ennemy->getBarycentre().z());
+                if( 360 * acos((forwardDir.x()*ennemyDir.x()+forwardDir.y()*ennemyDir.y())/(forwardDir.length()*ennemyDir.length()))/(2*M_PI) < ANGLE_OUVERTURE_TIR){
+                    double dist = getBarycentre().distanceToPoint(ennemy->getBarycentre());
+                    if( dist < minDist){
+                        minDist = dist;
+                        closestEnnemy = ennemy;
+                    }
+                }
 
-void Player::turnLeft(float power){
-    power = std::min(power,1.0f);
-    power = std::max(0.0f,power);
-    anglePlayer+=power*angularSpeed;
-}
-void Player::turnRight(float power){
-    power = std::min(power,1.0f);
-    power = std::max(0.0f,power);
-    anglePlayer-=power*angularSpeed;
+            }
+            if (closestEnnemy)
+                closestEnnemy->takeDamages(100);
+        }
+        shootSound->play();
+        ammo[weapon]--;
+    }
 }
 
 
-void Player::goForward(float power){
-    power = std::min(power,1.0f);
-    power = std::max(0.0f,power);
-    nz-=cos(M_PI * anglePlayer / 180.0)*speed;
-    nx-=sin(M_PI * anglePlayer / 180.0)*speed;
-}
-void Player::goBackward(float power){
-    power = std::min(power,1.0f);
-    power = std::max(0.0f,power);
-    nz+=cos(M_PI * anglePlayer / 180.0)*power*backwardSpeed;
-    nx+=sin(M_PI * anglePlayer / 180.0)*power*backwardSpeed;
-}
-
-void Player::movePlayer(float power){
-    if(power<0)
-        goBackward(-power);
-    else if(power>0)
-         goForward(power);
-}
-void Player::turnPlayer(float power){
-    if(power < 0)
-        turnRight(-power);
-    else if (power > 0)
-        turnLeft(power);
-}

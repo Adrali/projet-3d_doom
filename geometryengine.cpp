@@ -54,11 +54,22 @@
 
 #include <QVector2D>
 #include <QVector3D>
+#include <string.h>
+#include "file3D.h"
+#include "mainwidget.h"
+
+
 
 
 
 //! [0]
-GeometryEngine::GeometryEngine()
+
+/**
+ *
+ * Remy BARRIOL
+ * Gestion de l'initialisation des meshs suivant leurs types
+ */
+GeometryEngine::GeometryEngine(std::vector<QOpenGLTexture *>* lTextures,int type)
     : indexBuf(QOpenGLBuffer::IndexBuffer)
 {
     initializeOpenGLFunctions();
@@ -66,10 +77,37 @@ GeometryEngine::GeometryEngine()
     // Generate 2 VBOs
     arrayBuf.create();
     indexBuf.create();
-
+    GeolTextures=lTextures;
     // Initializes cube geometry and transfers it to VBOs
     //initCubeGeometry();
-    initPlanGeometry();
+
+    typeGeo=type;
+    if(type==0)
+        initCubeGeometry();
+    else if(type==1)
+        initPlanGeometry();
+    else if(type==2)
+        initOBJGeometry(":/obj/FirstStage.obj");
+    else if(type==3)
+        initOBJGeometry(":/obj/Skybox.obj");
+    else if(type==4)
+        initOBJGeometry(":/obj/UI2.obj");
+    else if(type==5)
+        initOBJGeometry(":/obj/Ammo.obj");
+    else if(type==6)
+        initOBJGeometry(":/obj/Armor.obj");
+    else if(type==7)
+        initOBJGeometry(":/obj/Health.obj");
+    else if(type==8)
+        initOBJGeometry(":/obj/BlueKey.obj");
+    else if(type==9)
+        initOBJGeometry(":/obj/YellowKey.obj");
+    else if(type==10)
+        initOBJGeometry(":/obj/RedKey.obj");
+    else if(type==11)
+        initOBJGeometry(":/obj/Ennemie.obj");
+    else if(type==12)
+        initOBJGeometry(":/obj/Porte.obj");
 
 }
 
@@ -233,9 +271,351 @@ void GeometryEngine::initPlanGeometry(){
     setBBValue();
 }
 
+
+
+
+/**
+ *
+ * Remy BARRIOL
+ * Gestion de l'affichage des meshs suivant leurs types (l'UI est un OBJ avec un affichage spéciale)
+ */
+
 void GeometryEngine::drawGeometry(QOpenGLShaderProgram *program)
 {
-    // Tell OpenGL which VBOs to use
+
+    int transColor = program->attributeLocation("red");
+    program->setAttributeValue(transColor,0.0f);
+    if((typeGeo==1)||(typeGeo==0))
+    {
+        // Tell OpenGL which VBOs to use
+        arrayBuf.bind();
+        indexBuf.bind();
+
+        // Offset for position
+        quintptr offset = 0;
+
+        // Tell OpenGL programmable pipeline how to locate vertex position data
+        int vertexLocation = program->attributeLocation("a_position");
+        program->enableAttributeArray(vertexLocation);
+        program->setAttributeBuffer(vertexLocation, GL_FLOAT, offset, 3, sizeof(VertexData));
+
+        // Offset for texture coordinate
+        offset += sizeof(QVector3D);
+
+        // Tell OpenGL programmable pipeline how to locate vertex texture coordinate data
+        int texcoordLocation = program->attributeLocation("a_texcoord");
+        program->enableAttributeArray(texcoordLocation);
+        program->setAttributeBuffer(texcoordLocation, GL_FLOAT, offset, 2, sizeof(VertexData));
+
+        // Draw cube geometry using indices from VBO 1
+        glDrawElements(GL_TRIANGLE_STRIP, indexBuf.size(), GL_UNSIGNED_SHORT, 0); //Careful update indicesNumber when creating new geometry
+    }
+    else if(typeGeo>1)
+    {
+        if(typeGeo==4)
+            drawUI(program);
+        else if((typeGeo>=5)&&(typeGeo<=11))
+            drawGeometryObject(program,true);
+        else
+            drawGeometryObject(program,false);
+    }
+}
+
+
+/**
+ *
+ * Remy BARRIOL
+ * Initialisation de la geometrie pour les OBJs
+ */
+
+
+void GeometryEngine::initOBJGeometry(std::string path)
+{
+    std::vector<unsigned int*> faceVertexIndices;
+    std::vector<unsigned int> linkTexture;
+    std::vector<unsigned int> linkFileTexture;
+    std::vector<unsigned int> linkNormal;
+    std::vector<float*> temp_vertices;
+    std::vector<float*> textureCoor;
+    std::vector<float*> normalCoor;
+    readOBJ(path,faceVertexIndices,linkTexture,linkFileTexture,linkNormal,temp_vertices,textureCoor,normalCoor);
+    unsigned int vertexNumber = linkTexture.size();
+    VertexData vertices[vertexNumber];
+
+    for(unsigned int i=0;i<vertexNumber;i++)
+    {
+        vertices[i]={QVector3D(temp_vertices.at(linkTexture.at(i))[0],temp_vertices.at(linkTexture.at(i))[1],temp_vertices.at(linkTexture.at(i))[2]), QVector2D(textureCoor.at(i)[0],textureCoor.at(i)[1])};
+        baseVertices.push_back(QVector3D(temp_vertices.at(linkTexture.at(i))[0],temp_vertices.at(linkTexture.at(i))[1],temp_vertices.at(linkTexture.at(i))[2]));
+    }
+
+    unsigned int indexCount = faceVertexIndices.size()*3;
+    GLushort indices[indexCount];
+    int realIndex=-1;
+    for(unsigned int i=0;i<faceVertexIndices.size();i++)
+    {
+        indices[++realIndex]=faceVertexIndices.at(i)[0];
+        indices[++realIndex]=faceVertexIndices.at(i)[1];
+        indices[++realIndex]=faceVertexIndices.at(i)[2];
+        baseIndex.push_back(faceVertexIndices.at(i)[0]);
+        baseIndex.push_back(faceVertexIndices.at(i)[1]);
+        baseIndex.push_back(faceVertexIndices.at(i)[2]);
+    }
+    linkFileTextureGeo=linkFileTexture;
+
+    arrayBuf.bind();
+    arrayBuf.allocate(vertices, vertexNumber * sizeof(VertexData));
+
+    indexBuf.bind();
+    indexBuf.allocate(indices,  indexCount* sizeof(GLushort));
+}
+
+
+/**
+ *
+ * Remy BARRIOL
+ * Affichage des OBJs (Choix de texture triangle par triangle)
+ */
+void GeometryEngine::drawGeometryObject(QOpenGLShaderProgram *program,bool transparency)
+{
+    arrayBuf.bind();
+    indexBuf.bind();
+
+    quintptr offset = 0;
+    int vertexLocation = program->attributeLocation("a_position");
+    program->enableAttributeArray(vertexLocation);
+    program->setAttributeBuffer(vertexLocation, GL_FLOAT, offset, 3, sizeof(VertexData));
+
+    offset += sizeof(QVector3D);
+
+    int texcoordLocation = program->attributeLocation("a_texcoord");
+    program->enableAttributeArray(texcoordLocation);
+    program->setAttributeBuffer(texcoordLocation, GL_FLOAT, offset, 2, sizeof(VertexData));
+
+
+    //Pour chaque triangle, on regarde la texture qui lui correspond
+    for(int i=0;i<indexBuf.size()/3;i++)
+    {
+        if(i<linkFileTextureGeo.size())
+        {
+            GeolTextures->at(linkFileTextureGeo.at(i))->bind();
+            if(transparency)
+            {
+                glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+                glEnable(GL_BLEND);
+            }
+            glDrawElements(GL_TRIANGLE_FAN, 3 , GL_UNSIGNED_SHORT, (GLvoid*)(sizeof(GLushort)*i*3));
+            if(transparency)
+                glDisable(GL_BLEND);
+        }
+    }
+}
+
+/**
+ *
+ * Remy BARRIOL
+ * Mise à jour des informations de l'interface
+ */
+void GeometryEngine::updateUI(int health,int ammo[6],bool key[3],int armor,int weapon,int stadeAnim)
+{
+    UI.health=health;
+    UI.armor=armor;
+    UI.weapon=weapon;
+    UI.stadeAnim=stadeAnim;
+    for(int i=0;i<6;i++)
+    {
+        UI.ammo[i]=ammo[i];
+    }
+    for(int i=0;i<3;i++)
+    {
+        UI.key[i]=key[i];
+    }
+
+}
+
+/**
+ *
+ * Remy BARRIOL
+ * Initialisation des valeurs de l'interface
+ */
+void GeometryEngine::setUI()
+{
+    UI.key[0]=false;
+    UI.key[1]=false;
+    UI.key[2]=false;
+    UI.ammo[0]=0;
+    UI.ammo[1]=40;
+    UI.ammo[2]=0;
+    UI.ammo[3]=0;
+    UI.ammo[4]=0;
+    UI.ammo[5]=0;
+    int dep=64;
+    for(int i=0;i<10;i++)
+    {
+        UI.textureNumber[i]=dep++;
+    }
+    for(int i=0;i<2;i++)
+    {
+        UI.ammo1[i]=-1;
+        UI.ammo2[i]=-1;
+        UI.ammo3[i]=-1;
+        UI.health1[i]=-1;
+        UI.health2[i]=-1;
+        UI.health3[i]=-1;
+        UI.armor1[i]=-1;
+        UI.armor2[i]=-1;
+        UI.armor3[i]=-1;
+        UI.head1[i]=-1;
+        UI.weapon1[i]=-1;
+        UI.redKey[i]=-1;
+        UI.blueKey[i]=-1;
+        UI.yellowKey[i]=-1;
+
+        UI.weaponStade1[i]=-1;
+        UI.weaponStade2[i]=-1;
+        UI.weaponStade3[i]=-1;
+    }
+    UI.stadeAnimWeapon1[0]=50;
+    UI.stadeAnimWeapon1[1]=51;
+    UI.stadeAnimWeapon1[2]=52;
+    for(unsigned int i=0;i<linkFileTextureGeo.size();i++)
+    {
+        if(linkFileTextureGeo.at(i)==70-1)
+        {
+            if(UI.ammo1[0]==-1)
+                UI.ammo1[0]=i;
+            else
+                UI.ammo1[1]=i;
+        }
+        if(linkFileTextureGeo.at(i)==71-1)
+        {
+            if(UI.ammo2[0]==-1)
+                UI.ammo2[0]=i;
+            else
+                UI.ammo2[1]=i;
+        }
+        if(linkFileTextureGeo.at(i)==72-1)
+        {
+            if(UI.ammo3[0]==-1)
+                UI.ammo3[0]=i;
+            else
+                UI.ammo3[1]=i;
+        }
+        if(linkFileTextureGeo.at(i)==67-1)
+        {
+            if(UI.health1[0]==-1)
+                UI.health1[0]=i;
+            else
+                UI.health1[1]=i;
+        }
+        if(linkFileTextureGeo.at(i)==68-1)
+        {
+            if(UI.health2[0]==-1)
+                UI.health2[0]=i;
+            else
+                UI.health2[1]=i;
+        }
+        if(linkFileTextureGeo.at(i)==69-1)
+        {
+            if(UI.health3[0]==-1)
+                UI.health3[0]=i;
+            else
+                UI.health3[1]=i;
+        }
+        if(linkFileTextureGeo.at(i)==64-1)
+        {
+            if(UI.armor1[0]==-1)
+                UI.armor1[0]=i;
+            else
+                UI.armor1[1]=i;
+        }
+        if(linkFileTextureGeo.at(i)==65-1)
+        {
+            if(UI.armor2[0]==-1)
+                UI.armor2[0]=i;
+            else
+                UI.armor2[1]=i;
+        }
+        if(linkFileTextureGeo.at(i)==66-1)
+        {
+            if(UI.armor3[0]==-1)
+                UI.armor3[0]=i;
+            else
+                UI.armor3[1]=i;
+        }
+        if(linkFileTextureGeo.at(i)==60-1)
+        {
+            if(UI.head1[0]==-1)
+                UI.head1[0]=i;
+            else
+                UI.head1[1]=i;
+        }
+        if(linkFileTextureGeo.at(i)==49-1)
+        {
+            if(UI.weapon1[0]==-1)
+                UI.weapon1[0]=i;
+            else
+                UI.weapon1[1]=i;
+        }
+        if(linkFileTextureGeo.at(i)==43-1)
+        {
+            if(UI.redKey[0]==-1)
+                UI.redKey[0]=i;
+            else
+                UI.redKey[1]=i;
+        }
+        if(linkFileTextureGeo.at(i)==44-1)
+        {
+            if(UI.yellowKey[0]==-1)
+                UI.yellowKey[0]=i;
+            else
+                UI.yellowKey[1]=i;
+        }
+        if(linkFileTextureGeo.at(i)==45-1)
+        {
+            if(UI.blueKey[0]==-1)
+                UI.blueKey[0]=i;
+            else
+                UI.blueKey[1]=i;
+        }
+        if(linkFileTextureGeo.at(i)==50-1)
+        {
+            if(UI.weaponStade1[0]==-1)
+                UI.weaponStade1[0]=i;
+            else
+                UI.weaponStade1[1]=i;
+        }
+        if(linkFileTextureGeo.at(i)==51-1)
+        {
+            if(UI.weaponStade2[0]==-1)
+                UI.weaponStade2[0]=i;
+            else
+                UI.weaponStade2[1]=i;
+        }
+        if(linkFileTextureGeo.at(i)==52-1)
+        {
+            if(UI.weaponStade3[0]==-1)
+                UI.weaponStade3[0]=i;
+            else
+                UI.weaponStade3[1]=i;
+        }
+    }
+
+}
+
+UIgo* GeometryEngine::getUIgo()
+{
+    return &UI;
+}
+
+
+
+/**
+ *
+ * Remy BARRIOL
+ * Choix des textures selon les valeurs de l'interface
+ */
+void GeometryEngine::drawUI(QOpenGLShaderProgram *program)
+{
     arrayBuf.bind();
     indexBuf.bind();
 
@@ -256,8 +636,140 @@ void GeometryEngine::drawGeometry(QOpenGLShaderProgram *program)
     program->setAttributeBuffer(texcoordLocation, GL_FLOAT, offset, 2, sizeof(VertexData));
 
     // Draw cube geometry using indices from VBO 1
-    glDrawElements(GL_TRIANGLE_STRIP, indexBuf.size(), GL_UNSIGNED_SHORT, 0); //Careful update indicesNumber when creating new geometry
+    //qDebug()<<indexBuf.size()<<"  ==  "<<linkFileTextureGeo.size();
+
+
+
+    for(int i=0;i<indexBuf.size()/3;i++)
+    {
+        if(i<linkFileTextureGeo.size())
+        {
+
+            int Tex=0;
+
+            if((UI.ammo1[0]==i)||(UI.ammo1[1]==i))
+            {
+                int number=UI.ammo[UI.weapon]/100;
+                Tex=UI.textureNumber[number]-1;
+            }
+            else if((UI.ammo2[0]==i)||(UI.ammo2[1]==i))
+            {
+                int number=UI.ammo[UI.weapon]/10;
+                int number1=(number/10)*10;
+                number-=number1;
+                Tex=UI.textureNumber[number]-1;
+            }
+            else if((UI.ammo3[0]==i)||(UI.ammo3[1]==i))
+            {
+                int number=UI.ammo[UI.weapon]/10;
+                int number1=number*10;
+                int number2=UI.ammo[UI.weapon]-number1;
+                Tex=UI.textureNumber[number2]-1;
+            }
+            else if((UI.health1[0]==i)||(UI.health1[1]==i))
+            {
+                int number=UI.health/100;
+                Tex=UI.textureNumber[number]-1;
+            }
+            else if((UI.health2[0]==i)||(UI.health2[1]==i))
+            {
+                int number=UI.health/10;
+                int number1=(number/10)*10;
+                number-=number1;
+                Tex=UI.textureNumber[number]-1;
+            }
+            else if((UI.health3[0]==i)||(UI.health3[1]==i))
+            {
+                int number=UI.health/10;
+                int number1=number*10;
+                int number2=UI.health-number1;
+                Tex=UI.textureNumber[number2]-1;
+            }
+            else if((UI.armor1[0]==i)||(UI.armor1[1]==i))
+            {
+                int number=UI.armor/100;
+                Tex=UI.textureNumber[number]-1;
+            }
+            else if((UI.armor2[0]==i)||(UI.armor2[1]==i))
+            {
+                int number=UI.armor/10;
+                int number1=(number/10)*10;
+                number-=number1;
+                Tex=UI.textureNumber[number]-1;
+            }
+            else if((UI.armor3[0]==i)||(UI.armor3[1]==i))
+            {
+                int number=UI.armor/10;
+                int number1=number*10;
+                int number2=UI.armor-number1;
+                Tex=UI.textureNumber[number2]-1;
+            }
+            else if((UI.head1[0]==i)||(UI.head1[1]==i))
+            {
+                Tex=59+UI.head-1;
+            }
+            else if((UI.weapon1[0]==i)||(UI.weapon1[1]==i))
+            {
+                if(UI.weapon==1)
+                    Tex=48-1;
+            }
+            else if((UI.redKey[0]==i)||(UI.redKey[1]==i))
+            {
+               if(UI.key[0])
+                    Tex=43-1;
+               else
+                    Tex=42-1;
+            }
+            else if((UI.yellowKey[0]==i)||(UI.yellowKey[1]==i))
+            {
+                if(UI.key[1])
+                     Tex=44-1;
+                else
+                     Tex=42-1;
+            }
+            else if((UI.blueKey[0]==i)||(UI.blueKey[1]==i))
+            {
+                if(UI.key[2])
+                     Tex=45-1;
+                else
+                     Tex=42-1;
+            }
+            else if((UI.weaponStade1[0]==i)||(UI.weaponStade1[1]==i))
+            {
+                if(UI.stadeAnim==0)
+                    Tex=50-1;
+                else
+                    Tex=42-1;
+            }
+            else if((UI.weaponStade2[0]==i)||(UI.weaponStade2[1]==i))
+            {
+                if(UI.stadeAnim==1)
+                    Tex=51-1;
+                else
+                    Tex=42-1;
+            }
+            else if((UI.weaponStade3[0]==i)||(UI.weaponStade3[1]==i))
+            {
+                if(UI.stadeAnim==2)
+                    Tex=52-1;
+                else
+                    Tex=42-1;
+            }
+            else
+                Tex=linkFileTextureGeo.at(i);
+            GeolTextures->at(Tex)->bind();
+
+
+            //Gère la transparence seulement pour l'interface
+            glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+            glEnable(GL_BLEND);
+            glDrawElements(GL_TRIANGLE_FAN, 3 , GL_UNSIGNED_SHORT, (GLvoid*)(sizeof(GLushort)*i*3));
+            glDisable(GL_BLEND);
+
+        }
+    }
 }
+
 
 boundingBox GeometryEngine::getBBox(){
     return bb;
@@ -266,5 +778,6 @@ boundingBox GeometryEngine::getBBox(){
 void GeometryEngine::setBBValue(){
     bb = boundingBox(baseVertices);
 }
+
 
 

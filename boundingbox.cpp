@@ -24,7 +24,7 @@ boundingBox::boundingBox(std::vector<QVector3D> vertices)
 }
 
 bool boundingBox::isOverlapping1D(float vmin1, float vmax1,float vmin2, float vmax2){
-    return vmax1>=vmin2 and vmax2 >=vmin1;
+    return !(vmax1<vmin2 || vmax2 < vmin1);
 }
 
 bool boundingBox::isOverlapping(boundingBox o){
@@ -32,7 +32,7 @@ bool boundingBox::isOverlapping(boundingBox o){
     QVector3D minO = o.getMinVertex();
     QVector3D maxO = o.getMaxVertex();
     for(int i=0;i<3;i++){
-        overlapping = overlapping and isOverlapping1D(minVertex[i],maxVertex[i],minO[i],maxO[i]);
+        overlapping = overlapping && isOverlapping1D(minVertex[i],maxVertex[i],minO[i],maxO[i]);
     }
     return overlapping;
 }

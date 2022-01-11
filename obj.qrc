@@ -1,0 +1,16 @@
+<RCC>
+    <qresource prefix="/">
+        <file>obj/FirstStage.obj</file>
+        <file>obj/UI.obj</file>
+        <file>obj/Skybox.obj</file>
+        <file>obj/UI2.obj</file>
+        <file>obj/Ammo.obj</file>
+        <file>obj/Armor.obj</file>
+        <file>obj/BlueKey.obj</file>
+        <file>obj/Ennemie.obj</file>
+        <file>obj/Health.obj</file>
+        <file>obj/Porte.obj</file>
+        <file>obj/RedKey.obj</file>
+        <file>obj/YellowKey.obj</file>
+    </qresource>
+</RCC>

@@ -1,11 +1,14 @@
-QT       += core gui widgets
+QT       += core gui widgets multimedia
 TARGET = gameengine
 TEMPLATE = app
 
 SOURCES += main.cpp \
     boundingbox.cpp \
     camera.cpp \
+    ennemy.cpp \
+    entity.cpp \
     gameobject.cpp \
+    loot.cpp \
     player.cpp \
     transformation.cpp \
     triangle.cpp
@@ -17,7 +20,12 @@ SOURCES += \
 HEADERS += \
     boundingbox.h \
     camera.h \
+    const_entity.h \
+    ennemy.h \
+    entity.h \
+    file3D.h \
     gameobject.h \
+    loot.h \
     mainwidget.h \
     geometryengine.h \
     player.h \
@@ -26,7 +34,9 @@ HEADERS += \
 
 RESOURCES += \
     maps.qrc \
+    obj.qrc \
     shaders.qrc \
+    sounds.qrc \
     textures.qrc
 
 # install
@@ -34,4 +44,4 @@ target.path = $$[YOUR_PATH]
 INSTALLS += target
 
 DISTFILES += \
-    ../sound/fire.wav
+    FirstStage.obj

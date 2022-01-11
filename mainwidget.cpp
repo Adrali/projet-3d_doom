@@ -60,12 +60,16 @@ MainWidget::MainWidget(QWidget *parent) :
     QOpenGLWidget(parent),
     cubeGeometries(0),
     planGeometries(0),
+    objGeometries(0),
     defaultTexture(0)
 {
     setMouseTracking(true);
     QCursor cursor(Qt::BlankCursor);
     QApplication::setOverrideCursor(cursor);
     QApplication::changeOverrideCursor(cursor);
+    mainMusic = new QSound(QString::fromStdString(":/sounds/level1Music.wav"));
+    mainMusic->setLoops(QSound::Infinite);
+
 }
 
 MainWidget::~MainWidget()
@@ -82,11 +86,18 @@ MainWidget::~MainWidget()
 
 
 //! [0]
-void MainWidget::mousePressEvent(QMouseEvent *e)
+void MainWidget::mousePressEvent(QMouseEvent * event)
 {
+    if (event->button() == Qt::LeftButton) {
+            player->shoot(lEnnemy);
+    }
 }
 
+void MainWidget::mouseReleaseEvent(QMouseEvent *event)
+{
 
+
+}
 void MainWidget::keyReleaseEvent(QKeyEvent *event)
 {
     keys[event->key()] = false;
@@ -98,6 +109,9 @@ void MainWidget::keyPressEvent(QKeyEvent *event)
     keys[event->key()] = true;
     if(event->key() == Qt::Key_P){
         isPause = !isPause;
+        QCursor cursor =  isPause ? Qt::ArrowCursor : Qt::BlankCursor;
+        QApplication::setOverrideCursor(cursor);
+        QApplication::changeOverrideCursor(cursor);
     }
     else if(event->key() == Qt::Key_F){
         isMouseForward = !isMouseForward;
@@ -108,21 +122,39 @@ void MainWidget::keyPressEvent(QKeyEvent *event)
     else if(event->key() == Qt::Key_Escape)
     {
          QCoreApplication::quit();
+    }else if(keys[Qt::Key_B]){
+        transformation t(player->getTransform());
+        QVector3D pos(player->getPlayerPosition());
+        lEnnemy.push_back(new Ennemy(cubeGeometries,t,monsterTexture,map,player,pos.x(),pos.y(),pos.z()));
+    }else if(keys[Qt::Key_V]){
+        qInfo()<<player->getPlayerPosition() << endl;
+    }else if(keys[Qt::Key_M]){
+        transformation t;
+        QVector3D pos(player->getPlayerPosition());
+        t.addTranslation(pos.x(),pos.y(),pos.z());
+        t.addRotationY(player->getPlayerAngle());
+        t.addTranslation(0,HAUTEUR_SOL_PLAYER/3,-80);
+
+        t.addScale(3,3,3);
+
+        bool keys[3] = {true,false,false};
+        int ammo[6] = {0,0,0,0,0,0};
+        Loot * loot = new Loot(cubeGeometries,t,medicTexture,map,player,20,0,keys,ammo,0,0,0);
+        lLoots.push_back(loot);
     }
     QWidget::keyPressEvent(event);
 }
 
-void MainWidget::mouseReleaseEvent(QMouseEvent *e)
-{
 
-}
 
 void MainWidget::timerEvent(QTimerEvent *)
 {
 
     //Recalcul de la caméra
     //camera->actualiseMatrix();
-    mainLoop();
+    if(!isPause){
+        mainLoop();
+    }
     update();
 }
 
@@ -131,7 +163,7 @@ void MainWidget::mouseMoveEvent(QMouseEvent* event){
     const int maxDeltaY = 30;
 
     //Calcul de la différence entre la dernière pos de la souris et maintenant
-    int deltax = width()/2-event->pos().x();
+    int deltax = width()/2 - event->pos().x();
     int deltay = height()/2 - event->pos().y();
 
     //On restraint la valeur du delta
@@ -143,14 +175,56 @@ void MainWidget::mouseMoveEvent(QMouseEvent* event){
     /*qInfo() << "X:" <<deltax;
     qInfo() << "Y:" <<deltay;*/
     //On tourne le joueur
-    player->turnPlayer(deltax/(maxDeltaX*1.0));
+    if(!isPause){
+        player->turnEntity(deltax/(maxDeltaX*1.0));
 
-    if(isMouseForward){
-        player->movePlayer(deltay/(maxDeltaX*1.0));
+        if(isMouseForward){
+            player->moveEntity(deltay/(maxDeltaX*1.0));
+        }
+
+        QPoint glob = mapToGlobal(QPoint(width()/2,height()/2));
+        QCursor::setPos(glob);
     }
 
-    QPoint glob = mapToGlobal(QPoint(width()/2,height()/2));
-    QCursor::setPos(glob);
+}
+
+void MainWidget::initialiseLevel(){
+    transformation t = transformation();
+    t.addTranslation(0,50,0);
+    player = new Player(cubeGeometries,t,defaultTexture,map,objGeometries.at(2),0,50,0);
+    entities->addChild(player);
+
+    parsingMapFile();
+
+
+    t.addScale(302,302,302);
+    t.addTranslation(0,-20,0);
+    t.addRotationX(90);
+    t.addRotationY(180);
+    gameobject * go2 = new gameobject(objGeometries.at(1),t,defaultTexture);
+    map->addChild(go2);
+
+    //Cr�ation de la Map
+
+    t = transformation();
+    t.addTranslation(0,50,0);
+    t.addRotationX(90);
+    t.addRotationY(180);
+    t.addScale(22,22,22);
+    t.addScale(1,-1,1);
+    t.addTranslation(0,0,-2.75);
+    gameobject * go = new gameobject(objGeometries.at(0),t,defaultTexture);
+    map->addChild(go);
+
+    t = transformation();
+
+    //t.addScale(5,5,5);
+
+    bool keys[3] = {false,false,false};
+    int ammo[6] = {0,0,0,0,0,0};
+    //Loot * loot = new Loot(objGeometries.at(3),t,medicTexture,map,player,20,0,keys,ammo,742.427, 105.396, 209.159);
+    Loot * loot = new Loot(cubeGeometries,t,medicTexture,map,player,20,0,keys,ammo,742.427, 105.396, 209.159);
+    lLoots.push_back(loot);
 }
 
 void MainWidget::initializeGL()
@@ -166,18 +240,18 @@ void MainWidget::initializeGL()
 //! [2]
     // Enable depth buffer
     glEnable(GL_DEPTH_TEST);
-
     // Enable back face culling
-    glEnable(GL_CULL_FACE);
+   glPolygonMode( GL_FRONT_AND_BACK ,GL_CULL_FACE);
 //! [2]
     //Graphe de scène
 
 
-    cubeGeometries = new GeometryEngine;
-    cubeGeometries->initCubeGeometry();
-    planGeometries = new GeometryEngine;
-    planGeometries->initPlanGeometry();
-
+    cubeGeometries = new GeometryEngine(&lTextures,0);
+    planGeometries = new GeometryEngine(&lTextures,1);
+    objGeometries.push_back(new GeometryEngine(&lTextures,2));
+    objGeometries.push_back(new GeometryEngine(&lTextures,3));
+    objGeometries.push_back(new GeometryEngine(&lTextures,4));
+    objGeometries.push_back(new GeometryEngine(&lTextures,6));
 
     root = new gameobject(nullptr,transformation(),0);
     map = new gameobject(nullptr,transformation(),0);
@@ -186,13 +260,34 @@ void MainWidget::initializeGL()
     root->addChild(map);
     root->addChild(entities);
 
+    initialiseLevel();
+
+
+    //Cr�ation de l'interface
+
 
     t = transformation();
-    t.addTranslation(0,50,0);
-    player = new Player(cubeGeometries,t,defaultTexture,map);
-    entities->addChild(player);
+    t.addTranslation(0,-1.75,-2);
+    t.addRotationX(90);
+    t.addRotationZ(90);
+    t.addScale(0.105,0.105,-0.105);
+    //t.addRotationY(180);
+    //t.addScale(22,22,22);
+    objGeometries.at(2)->setUI();
+    bool key[3];
+    key[0]=false;
+    key[1]=false;
+    key[2]=false;
+    int ammo[6];
+    ammo[1]=523;
+    objGeometries.at(2)->updateUI(22,ammo,key,28,1,1);
+    gameobject * go1 = new gameobject(objGeometries.at(2),t,defaultTexture);
 
-    parsingMapFile();
+    player->addChild(go1);
+    mainMusic->play();
+
+
+
     // Use QBasicTimer because its faster than QTimer
     timer.start(12, this);
 }
@@ -233,6 +328,30 @@ void MainWidget::initTextures()
     // f.ex. texture coordinate (1.1, 1.2) is same as (0.1, 0.2)
     defaultTexture->setWrapMode(QOpenGLTexture::Repeat);
 
+    medicTexture = new QOpenGLTexture(QImage(":/textures/medic.png").mirrored());
+
+    // Set nearest filtering mode for texture minification
+    medicTexture->setMinificationFilter(QOpenGLTexture::Nearest);
+
+    // Set bilinear filtering mode for texture magnification
+    medicTexture->setMagnificationFilter(QOpenGLTexture::Linear);
+
+    // Wrap texture coordinates by repeating
+    // f.ex. texture coordinate (1.1, 1.2) is same as (0.1, 0.2)
+    medicTexture->setWrapMode(QOpenGLTexture::Repeat);
+
+    monsterTexture = new QOpenGLTexture(QImage(":/textures/monster.png").mirrored());
+
+    // Set nearest filtering mode for texture minification
+    monsterTexture->setMinificationFilter(QOpenGLTexture::Nearest);
+
+    // Set bilinear filtering mode for texture magnification
+    monsterTexture->setMagnificationFilter(QOpenGLTexture::Linear);
+
+    // Wrap texture coordinates by repeating
+    // f.ex. texture coordinate (1.1, 1.2) is same as (0.1, 0.2)
+    monsterTexture->setWrapMode(QOpenGLTexture::Repeat);
+
     parsingTextureFile();
 }
 //! [4]
@@ -242,7 +361,7 @@ void MainWidget::resizeGL(int w, int h)
     // Calculate aspect ratio
     qreal aspect = qreal(w) / qreal(h ? h : 1);
     // Set near plane to 3.0, far plane to 7.0, field of view 45 degrees
-    const qreal zNear = 2.0, zFar = 600.0, fov = 45.0;
+    const qreal zNear = 1.1, zFar = 12000.0, fov = 45.0;
 
 
     // Reset projection
@@ -267,9 +386,16 @@ void MainWidget::paintGL()
     program.setUniformValue("mvp_matrix", camera->getMVPMatrix());
 
     //Affichage du graphe de scène
-    root->displayAll(&program, camera->getMVPMatrix());
-}
+    for(Ennemy * ennemy : lEnnemy){
+        ennemy->displayAll(&program, camera->getMVPMatrix());
+    }
 
+    for(Loot * loot : lLoots){
+        loot->displayAll(&program, camera->getMVPMatrix());
+    }
+    root->displayAll(&program, camera->getMVPMatrix());
+
+}
 
 void MainWidget::parsingTextureFile(){
     //////////
@@ -287,7 +413,6 @@ void MainWidget::parsingTextureFile(){
     QTextStream in(&infile);
 
 
-
     while (!in.atEnd())
     {
         QString qLine = in.readLine();
@@ -300,6 +425,7 @@ void MainWidget::parsingTextureFile(){
 
         }else{
             std::stringstream(line) >> path;
+
 
             lTextures.push_back(new QOpenGLTexture(QImage(QString::fromStdString(path)).mirrored()));
 
@@ -316,8 +442,6 @@ void MainWidget::parsingTextureFile(){
 
     }
 }
-
-
 
 void MainWidget::parsingMapFile(){
     //////////
@@ -379,7 +503,7 @@ void MainWidget::parsingMapFile(){
             if(idTexture < lTextures.size() && idTexture>=0 ){
                 texture = lTextures[idTexture];
             }
-            //appliquer les nouvelles transformations à t
+            //appliquer les nouvelles transformations �  t
             gameobject * go = new gameobject(mesh,t,texture);
             boundingBox bb = go->getBBox();
             //qDebug() <<"\tTransforms : " << bb.getMinVertex() << " " << bb.getMaxVertex() << "" << go->getBarycentre() <<endl;
@@ -422,8 +546,24 @@ void MainWidget::mainLoop(){
         {
             player->turnRight();
         }
-        player->actualisePosition();
+        player->update();
+        for(Ennemy * ennemy : lEnnemy){
+            ennemy->update();
+        }
+        for(Loot * loot : lLoots){
+            loot->update();
+        }
+        lLoots.erase(std::remove_if(lLoots.begin(), lLoots.end(),
+                          [](Loot * loot) {
+                              return loot->isLootUsed(); // put your condition here
+                          }), lLoots.end());
+        lEnnemy.erase(std::remove_if(lEnnemy.begin(), lEnnemy.end(),
+                          [](Ennemy * ennemy) {
+                              return ennemy->isDead(); // put your condition here
+                          }), lEnnemy.end());
         camera->actualiseVueMatrix();
+
+
     }
 
 }
@@ -432,3 +572,6 @@ void MainWidget::on_action_Fullscreen_triggered()
 {
     isFullScreen() ? showNormal() : showFullScreen();
 }
+
+
+

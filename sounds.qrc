@@ -1,0 +1,8 @@
+<RCC>
+    <qresource prefix="/">
+        <file>sounds/shoot.mp3</file>
+        <file>sounds/shoot.wav</file>
+        <file>sounds/pickupLoot.wav</file>
+        <file>sounds/level1Music.wav</file>
+    </qresource>
+</RCC>

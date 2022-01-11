@@ -56,6 +56,9 @@
 #include "transformation.h"
 #include "player.h"
 #include "camera.h"
+#include "ennemy.h"
+#include "loot.h"
+#include "const_entity.h"
 
 #include <QOpenGLWidget>
 #include <QOpenGLFunctions_3_1>
@@ -68,6 +71,7 @@
 #include <QTimer>
 #include <QMessageBox>
 #include <QtDebug>
+#include <QSound>
 
 #include <iostream>
 #include <fstream>
@@ -77,6 +81,9 @@
 class GeometryEngine;
 
 enum TypeMesh {PLAN,CUBE,SPHERE,OBJECT};
+
+
+
 
 class MainWidget : public QOpenGLWidget, protected QOpenGLFunctions_3_1
 {
@@ -102,7 +109,8 @@ protected:
     void initTextures();
     void mouseMoveEvent(QMouseEvent* event);
     void on_action_Fullscreen_triggered();
-
+    void initialiseLevel();
+    Ennemy * closestPlayerTarget(Player * p);
 private:
     QTimer *timers;
     QMap<int, bool> keys;
@@ -112,19 +120,29 @@ private:
     //Geometries
     GeometryEngine *cubeGeometries;
     GeometryEngine *planGeometries;
+    std::vector<GeometryEngine*> objGeometries;
     //Gameobjects
     gameobject * root;
     gameobject * map;
     gameobject * entities;
+    gameobject * UI;
     Player * player;
+    std::vector<Ennemy *> lEnnemy;
+    std::vector<Loot *> lLoots;
+
     //Textures
     QOpenGLTexture *defaultTexture;
     std::vector<QOpenGLTexture *> lTextures;
+    QOpenGLTexture * medicTexture;
+    QOpenGLTexture * monsterTexture;
     //Cameras
     Camera * camera;
     //gameBooleans
     bool isPause = false;
     bool isMouseForward = false;
+
+    //Sound
+    QSound * mainMusic;
 
 };
 

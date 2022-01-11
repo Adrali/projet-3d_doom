@@ -57,23 +57,73 @@
 #include <vector>
 #include "boundingbox.h"
 #include "triangle.h"
+#include <QOpenGLTexture>
+#include <math.h>
+
 struct VertexData
 {
     QVector3D position;
     QVector2D texCoord;
 };
 
+/**
+ *
+ * Remy BARRIOL
+ * Conserve les informations necessaires pour la gestion de l'UI, les textures et les donn�es � afficher
+ */
+struct UIgo
+{
+                bool key[3];
+                int weapon=1;
+                int stadeAnim=0;
+                int health=100;
+                int ammo[6];
+                int armor=100;
+                int head=0;
+
+                int ammo1[2];
+                int ammo2[2];
+                int ammo3[2];
+                int health1[2];
+                int health2[2];
+                int health3[2];
+                int armor1[2];
+                int armor2[2];
+                int armor3[2];
+                int head1[2];
+                int weapon1[2];
+                int redKey[2];
+                int blueKey[2];
+                int yellowKey[2];
+
+                int weaponStade1[2];
+                int weaponStade2[2];
+                int weaponStade3[2];
+
+                //std::vector<unsigned int>* linkFileTextureGeo;
+
+                int textureNumber[10];
+                int stadeAnimWeapon1[3];
+};
+
+
 class GeometryEngine : protected QOpenGLFunctions_3_1
 {
 public:
     ////Constructors
-    GeometryEngine();
+    GeometryEngine(std::vector<QOpenGLTexture *>* lTextures,int type);
     ////Destructor
     virtual ~GeometryEngine();
     ////Methods
     void drawGeometry(QOpenGLShaderProgram *program);
+    void drawGeometryObject(QOpenGLShaderProgram *program,bool transparency);
+    void drawUI(QOpenGLShaderProgram *program);
+    void setUI();
+    void updateUI(int health,int ammo[6],bool key[3],int armor,int weapon,int stadeAnim);
     void initPlanGeometry();
     void initCubeGeometry();
+    void initOBJGeometry(std::string path);
+    UIgo* getUIgo();
 
     std::vector<QVector3D> getBaseVertices() const{
         std::vector<QVector3D> v(baseVertices);
@@ -82,10 +132,15 @@ public:
         std::vector<int> v(baseIndex);
         return v;}
     boundingBox getBBox();
+    int getType(){
+        return typeGeo;
+    }
+
 
 private:
 
     ////Methods
+    ///
     void setBBValue();
     ////Variables
     std::vector<QVector3D> baseVertices;
@@ -93,6 +148,12 @@ private:
     QOpenGLBuffer arrayBuf;
     QOpenGLBuffer indexBuf;
     boundingBox bb;
+    std::vector<QOpenGLTexture *>* GeolTextures;
+    std::vector<unsigned int> linkFileTextureGeo;
+    int typeGeo = -1;
+    UIgo UI;
 };
+
+
 
 #endif // GEOMETRYENGINE_H

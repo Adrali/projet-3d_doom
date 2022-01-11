@@ -54,17 +54,29 @@ triangle gameobject::getClosestTriangleDown(QVector3D p){
     std::vector<QVector3D> vertices = getActualVertices();
     float minDist = std::numeric_limits<float>::infinity();
     triangle minTriangle(QVector3D(0,0,0),QVector3D(0,0,0),QVector3D(0,0,0));
-
-    for(unsigned int i=0;(i+2)<indexs.size();i++){
-        if(indexs[i+1]!=indexs[i+2]){
+    //qInfo() <<mesh->getType() <<endl;
+    if(mesh->getType()>=2){
+        for(unsigned int i=0;(i+2)<indexs.size();i+=3){
             triangle tmp = triangle(vertices[indexs[i]],vertices[indexs[i+1]],vertices[indexs[i+2]]);
             float hPoint = tmp.hauteurPoint(p);
             if(minDist > hPoint && hPoint >= 0){
                 minDist = hPoint;
                 minTriangle = tmp;
             }
-        }else{//Si on a un double indice, on passe au triangle suivant.
-            i+=3;
+
+        }
+    }else{
+        for(unsigned int i=0;(i+2)<indexs.size();i++){
+            if(indexs[i+1]!=indexs[i+2]){
+                triangle tmp = triangle(vertices[indexs[i]],vertices[indexs[i+1]],vertices[indexs[i+2]]);
+                float hPoint = tmp.hauteurPoint(p);
+                if(minDist > hPoint && hPoint >= 0){
+                    minDist = hPoint;
+                    minTriangle = tmp;
+                }
+            }else{//Si on a un double indice, on passe au triangle suivant.
+                i+=3;
+            }
         }
     }
     //qInfo()<< "Infunc"<<minDist<<endl;

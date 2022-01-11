@@ -21,7 +21,9 @@ private :
    Player * p;
    const qreal zNear = 2.0, zFar = 600.0, fov = 45.0;
    qreal aspect;
-
+   gameobject * ui;
+   bool isUI = false;
+   QOpenGLShaderProgram * program;
 public :
    /*!
     *  \brief Constructeur de la classe Camera
@@ -86,6 +88,13 @@ public :
    QMatrix4x4 getMVPMatrix(){
        return QMatrix4x4(projection * vue);
    }
+   void setUI(gameobject * _ui,QOpenGLShaderProgram * _program){
+    ui = _ui;
+    program = _program;
+    isUI = true;
+   }
+   void update();
+
 };
 
 #endif // CAMERA_H

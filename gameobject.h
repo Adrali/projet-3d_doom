@@ -3,8 +3,16 @@
 #include <geometryengine.h>
 #include <transformation.h>
 #include <QOpenGLTexture>
+#include <QSound>
+#include <QtMultimedia/QMediaPlayer>
 #include <vector>
 #include "boundingbox.h"
+
+
+
+
+
+
 
 /**
  * @brief Représente un gameobject, celui ci est composé d'un mesh, d'une transformation et d'une texture
@@ -26,7 +34,7 @@ public :
      *
      *  \param mesh_ : représente le mesh du gameobject. Si mesh_ = nullptr, le gameobject ne sera pas affiché
      *  \param transform_ : représente la transformation de la position des vertex du mesh_
-     *  \param transform_ : pointeur sur la texure à afficher
+     *  \param transform_ : pointeur sur la texure �  afficher
      */
     gameobject(GeometryEngine * mesh_,transformation transform_, QOpenGLTexture * texture_) : mesh(mesh_), transform(transform_),texture(texture_){
     }
@@ -42,7 +50,7 @@ public :
     //Display methods
     /*!
      *  \brief Méthode qui affiche le gameobject avec sa texture associée avec pour origine de transformation la transformation de son parent
-     *  \param parentTransform : la transformation qui sert à déplacer l'origine de la transformation de this
+     *  \param parentTransform : la transformation qui sert �  déplacer l'origine de la transformation de this
      *  \param program : pointeur vers la fenêtre
      *  \param projection : matrice de projection de la Camera de la scène
      */
@@ -55,7 +63,7 @@ public :
     void displayObject(QOpenGLShaderProgram *program,QMatrix4x4 projection);
     /*!
      *  \brief Méthode qui affiche le gameobject avec sa texture associée et avec pour origine de transformation la transformation de son parent ainsi que tous ses enfants
-     *  \param parentTransform : la transformation qui sert à déplacer l'origine de la transformation de this
+     *  \param parentTransform : la transformation qui sert �  déplacer l'origine de la transformation de this
      *  \param program : pointeur vers la fenêtre
      *  \param projection : matrice de projection de la Camera de la scène
      */
@@ -67,8 +75,8 @@ public :
      */
     void displayAll(QOpenGLShaderProgram *program,QMatrix4x4 projection);
     /*!
-     *  \brief Ajoute un enfant à this dans le graphe de scène
-     *  \param go_ : enfant à ajouter
+     *  \brief Ajoute un enfant �  this dans le graphe de scène
+     *  \param go_ : enfant �  ajouter
      */
     void addChild(gameobject * go_){childs.push_back(go_);}
 
@@ -84,7 +92,7 @@ public :
     std::vector<gameobject *> getChilds(){return childs;}
 
     /*!
-     * \brief Retourne la liste des vertex du gameobject à leurs positions transformées
+     * \brief Retourne la liste des vertex du gameobject �  leurs positions transformées
      * \return std::vector de QVector3D représentant les vertexs
      */
     std::vector<QVector3D> getActualVertices();
@@ -116,7 +124,7 @@ public :
      * \brief Retourne le triangle du gameobject le plus proche situé sur la droite paramétrique formée par p et le vecteur (0,-1,0) tel que la distance est positive
      *
      * \param p : le point de la droite paramétrique
-     * \param distance : référence qui sert à affecter la distance du point vers le triangle
+     * \param distance : référence qui sert �  affecter la distance du point vers le triangle
      *
      * \return Triangle le plus proche. Si il n'y a pas de triangle, alors renvoie un triangle avec pour sommet (0,0,0)
      */
@@ -134,7 +142,9 @@ public :
         }
     }
 
-
+    int getGeometryType(){
+        return mesh->getType();
+    }
 
 
 protected:
@@ -148,5 +158,7 @@ protected:
     gameobject();
 
 };
+
+
 #endif
 
