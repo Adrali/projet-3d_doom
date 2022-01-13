@@ -16,14 +16,14 @@ void Entity::turnRight(float power){
 void Entity::goForward(float power){
     power = std::min(power,1.0f);
     power = std::max(0.0f,power);
-    nz-=cos(M_PI * angleEntity / 180.0)*speed;
-    nx-=sin(M_PI * angleEntity / 180.0)*speed;
+    nz-=GameTime::getDeltaTime()*cos(M_PI * angleEntity / 180.0)*speed;
+    nx-=GameTime::getDeltaTime()*sin(M_PI * angleEntity / 180.0)*speed;
 }
 void Entity::goBackward(float power){
     power = std::min(power,1.0f);
     power = std::max(0.0f,power);
-    nz+=cos(M_PI * angleEntity / 180.0)*power*backwardSpeed;
-    nx+=sin(M_PI * angleEntity / 180.0)*power*backwardSpeed;
+    nz+=GameTime::getDeltaTime()*cos(M_PI * angleEntity / 180.0)*power*backwardSpeed;
+    nx+=GameTime::getDeltaTime()*sin(M_PI * angleEntity / 180.0)*power*backwardSpeed;
 }
 
 void Entity::moveEntity(float power){

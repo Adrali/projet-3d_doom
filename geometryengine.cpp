@@ -99,11 +99,11 @@ GeometryEngine::GeometryEngine(std::vector<QOpenGLTexture *>* lTextures,int type
     else if(type==7)
         initOBJGeometry(":/obj/Health.obj");
     else if(type==8)
-        initOBJGeometry(":/obj/BlueKey.obj");
+        initOBJGeometry(":/obj/RedKey.obj");
     else if(type==9)
         initOBJGeometry(":/obj/YellowKey.obj");
     else if(type==10)
-        initOBJGeometry(":/obj/RedKey.obj");
+        initOBJGeometry(":/obj/BlueKey.obj");
     else if(type==11)
         initOBJGeometry(":/obj/Ennemie.obj");
     else if(type==12)

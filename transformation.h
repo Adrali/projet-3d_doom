@@ -20,26 +20,51 @@ private:
     QMatrix4x4 transform;
 public:
     ////Constructors
+    /*!
+    *  \brief Constructeur
+    *  Construit la transformation à partir d'une matrice unitaire I4
+    */
     transformation(){transform.setToIdentity();}
+    /*!
+     *  \brief Constructeur
+     *  Construit la transformation à partir d'une matrice 4x4
+     */
     transformation(QMatrix4x4 t) : transform(t){}
     //transformation(float tx,float ty, float tz, float rx, float ry, float rz, float sx, float sy, float sz);
 
     ////Methods
+    /*!
+     *  \brief Applique la transformation au vecteur passé en paramêtre
+     */
     QVector3D applyTransformation(QVector3D);
+    /*!
+     *  \brief Retourne la transformation sous forme de matrice 4x4
+     *  \return Une matrice 4x4
+     */
     QMatrix4x4 getTransformationMatrix(){return transform;}
 
     //transformation methods
+    /*!
+     *  \brief Ajoute une rotation autour de l'axe X à la transformation
+     */
     void addRotationX(float angle){transform.rotate(angle,QVector3D(1,0,0));}
+    /*!
+     *  \brief Ajoute une rotation autour de l'axe Y à la transformation
+     */
     void addRotationY(float angle){transform.rotate(angle,QVector3D(0,1,0));}
+    /*!
+     *  \brief Ajoute une rotation autour de l'axe Z à la transformation
+     */
     void addRotationZ(float angle){transform.rotate(angle,QVector3D(0,0,1));}
+    /*!
+     *  \brief Ajoute une translation à la transformation
+     */
     void addTranslation(float tx, float ty, float tz){transform.translate(tx,ty,tz);}
+    /*!
+     *  \brief Ajoute une mise à l'échelle à la transformation
+     */
     void addScale(float sx, float sy, float sz){transform.scale(sx,sy,sz);}
 
-
-    float angleBetweenVectors2D(QVector3D v1,QVector3D v2)
-    {
-        return atan2(v1.x()*v2.y()-v2.x()*v1.y(),v1.x()*v1.y()+v2.x()*v2.y());
-    }
 };
 
 

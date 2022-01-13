@@ -79,7 +79,7 @@ void Player::shoot(std::vector<Ennemy * > _lEnnemy){
 
             }
             if (closestEnnemy)
-                closestEnnemy->takeDamages(100);
+                closestEnnemy->takeDamages(15);
         }
         stadeAnimTir=1;
         animTirTimeReamening = 0.1;

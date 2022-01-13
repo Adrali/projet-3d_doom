@@ -92,5 +92,6 @@
         <file>textures/83.png</file>
         <file>textures/medic.png</file>
         <file>textures/monster.png</file>
+        <file>textures/armor.png</file>
     </qresource>
 </RCC>

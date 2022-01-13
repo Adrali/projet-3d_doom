@@ -99,7 +99,6 @@ public:
     void takeDamages(int damages){
         hp -=damages;
         hp = std::max(hp,0);
-        qInfo()<<hp;
     }
 
 protected:
@@ -116,7 +115,7 @@ protected:
     const float vitesseChuteMax = 1.0f; //Vitesse de chute d'une entité
 
     //Gameplay
-    int hp=10;
+    int hp;
 
 };
 

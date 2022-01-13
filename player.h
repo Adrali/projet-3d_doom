@@ -64,7 +64,8 @@ public:
         angularSpeed = 5.0f;
         hauteurSol = HAUTEUR_SOL_PLAYER;
         isDisplaying = false;
-        hp = 80;
+        hp = 100;
+        armor = 50;
         shootSound = new QSound(QString::fromStdString(":/sounds/shoot.wav"));
 
     };
@@ -136,7 +137,7 @@ public:
      *  \param _hpValue : nombre de point de vie à ajouter
      */
     void addHp(int _hpValue){
-        hp + = _hpValue;
+        hp += _hpValue;
         hp = std::min(hp, HP_MAX_JOUEUR);
     }
 
@@ -172,6 +173,43 @@ public:
             keys[i] = keys[i] || _keys[i];
         }
     }
+
+    /*!
+     *  \brief Retourne le nombre de hp du player
+     *
+     *  \return hp du player
+     */
+    int getHP(){
+        return hp;
+    }
+
+    /*!
+     *  \brief Retourne le nombre d'armure du player
+     *
+     *  \return armure du player
+     */
+    int getArmor(){
+        return armor;
+    }
+
+    /*!
+     *  \brief Retourne l'etat des clés du joueur
+     *
+     *  \return tableau avec l'état des clés du player
+     */
+    bool * getKeyState(){
+        return keys;
+    }
+
+    /*!
+     *  \brief Retourne le nombre de balles du joueur
+     *
+     *  \return tableau avec le nombre de balle du joueur
+     */
+    int * getAmmo(){
+        return ammo;
+    }
+
 
 };
 #endif // PLAYER_H

@@ -38,25 +38,28 @@ public:
      *  Constructeur de la classe Ennemy
      *
      */
-    Ennemy(GeometryEngine * _mesh,transformation _transfo, QOpenGLTexture *  _texture, gameobject * _map, Entity * _p,float _x, float _y, float _z) : Entity(_mesh,_transfo,_texture,_map,x,y,z),player(_p){
+    Ennemy(GeometryEngine * _mesh,transformation _transfo, QOpenGLTexture *  _texture, gameobject * _map, Entity * _p,float _x, float _y, float _z, int _hp=10) : Entity(_mesh,_transfo,_texture,_map,x,y,z),player(_p){
         isDisplaying = true;
         QVector3D barycentre = getBarycentre();
-        nx = x = barycentre.x();
+        /*nx = x = barycentre.x();
         ny = y = barycentre.y();
-        nz = z = barycentre.z();
+        nz = z = barycentre.z();*/
+        nx = x = _x;
+        ny = y = _y;
+        nz = z = _z;
         damageSound = new QSound(QString::fromStdString(":/sounds/hit.wav"));
-
+        hp = _hp;
     };
 
 
     /*!
-     *  \brief Update la position de l'ennemi
+     *  @brief Update la position de l'ennemi
      *
      */
     void updatePosition();
 
     /*!
-     *  \brief Update l'ennemi
+     *  @brief Update l'ennemi
      *
      */
     void update();
@@ -64,7 +67,6 @@ public:
 
 
 private:
-    int hp = 1; //Les points de vie de l'ennemi
     Entity * player; //Un pointeur vers le joueur
     double attackCooldown = COOLDOWN_MAX_ATTAQUE_ENNEMI; //Temps d'attente avant la prochaine attaque
     QSound * damageSound; //Pointeur vers le player du son de dégat au joueur

@@ -107,31 +107,90 @@ struct UIgo
 };
 
 
+/**
+ * @brief Représente un mesh avec ses méthodes d'affichage
+ * @author Pierre.L
+ * @version 0.1
+ * @date 10 dec 2021
+ *
+ * Header de la classe GeometryEngine
+ *
+ */
 class GeometryEngine : protected QOpenGLFunctions_3_1
 {
 public:
     ////Constructors
+    /*!
+    *  \brief Constructeur de la classe GeometryEngine
+    *
+    *  \param lTextures : Liste des textures du mesh
+    *  \param type : type du mesh
+    */
     GeometryEngine(std::vector<QOpenGLTexture *>* lTextures,int type);
     ////Destructor
+    /*!
+    *  \brief Destructeur de la classe GeometryEngine
+    *
+    */
     virtual ~GeometryEngine();
     ////Methods
+    /*!
+    *  \brief Dessine le mesh
+    */
     void drawGeometry(QOpenGLShaderProgram *program);
+    /*!
+    *  \brief Dessine le mesh
+    *  \param transparency : vrai pour activer la transparance
+    */
     void drawGeometryObject(QOpenGLShaderProgram *program,bool transparency);
+    /*!
+    *  \brief Dessine l'UI
+    */
     void drawUI(QOpenGLShaderProgram *program);
+    /*!
+    *  \brief Initialise l'UI
+    */
     void setUI();
+    /*!
+    *  \brief Actualise l'UI à partir des données du joueur
+    */
     void updateUI(int health,int ammo[6],bool key[3],int armor,int weapon,int stadeAnim);
+    /*!
+    *  \brief Initialise le mesh en tant que plan
+    */
     void initPlanGeometry();
+    /*!
+    *  \brief Initialise le mesh en tant que cube
+    */
     void initCubeGeometry();
+    /*!
+    *  \brief Initialise le mesh à partir d'un Obj
+    */
     void initOBJGeometry(std::string path);
+    /*!
+    *  \brief retourne un  pointeur sur l'UI
+    */
     UIgo* getUIgo();
+    /*!
+    *  \brief Retourne la liste des vertices du mesh
+    */
 
     std::vector<QVector3D> getBaseVertices() const{
         std::vector<QVector3D> v(baseVertices);
         return v;}
+    /*!
+    *  \brief Retourne la liste des indexs du mesh
+    */
     std::vector<int> getIndex() const{
         std::vector<int> v(baseIndex);
         return v;}
+    /*!
+    *  \brief Retourne la BoundingBox englobant le mesh
+    */
     boundingBox getBBox();
+    /*!
+    *  \brief Retourne le type du joueur
+    */
     int getType(){
         return typeGeo;
     }

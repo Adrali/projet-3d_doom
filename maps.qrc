@@ -2,5 +2,6 @@
     <qresource prefix="/">
         <file>map.txt</file>
         <file>textures.txt</file>
+        <file>entity.txt</file>
     </qresource>
 </RCC>

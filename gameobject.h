@@ -178,7 +178,7 @@ protected:
     GeometryEngine * mesh; //Mesh du gameobject
     bool isDisplaying = true; //Vrai si l'objet doit d'afficher
     transformation transform; //Transform du gameobject
-    std::vector<gameobject *> childs;
+    std::vector<gameobject *> childs; //Liste des gameobject enfants
     gameobject();
 
 };

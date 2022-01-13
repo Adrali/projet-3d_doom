@@ -11,7 +11,7 @@ void Ennemy::updatePosition(){
 
     QVector3D newPoint(x,y,z);
     //Actualise la hauteur du joueur
-    double minDistance = std::numeric_limits<double>::infinity();
+    /*double minDistance = std::numeric_limits<double>::infinity();
     for(gameobject * go : map->getChilds()){
         if(go->getBBox().isOverBoundingBox(newPoint)){
             double actDistance;
@@ -30,7 +30,7 @@ void Ennemy::updatePosition(){
         if(vitesseChuteMax < (minDistance - hauteurSol))
             delta = vitesseChuteMax;
         y = y - delta;
-    }
+    }*/
 
     //Actualise la pos du joueur
     t.addTranslation(x,y,z);

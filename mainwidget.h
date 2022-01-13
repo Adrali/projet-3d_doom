@@ -85,7 +85,15 @@ enum TypeMesh {PLAN,CUBE,SPHERE,OBJECT};
 
 
 
-
+/**
+ * @brief Classe centrale du moteur. Gère la scène 3D ainsi que la gameloop
+ * @author Pierre.L
+ * @version 0.1
+ * @date 10 dec 2021
+ *
+ * Header de la classe MainWidget
+ *
+ */
 class MainWidget : public QOpenGLWidget, protected QOpenGLFunctions_3_1
 {
     Q_OBJECT
@@ -95,23 +103,76 @@ public:
     ~MainWidget();
 
 protected:
+    /*!
+    *  \brief Fonction qui gère les appuis des touches de la souris
+    */
     void mousePressEvent(QMouseEvent *e) override;
+    /*!
+    *  \brief Fonction qui gère les fin d'appuis des touches de le clavier
+    */
     void keyReleaseEvent(QKeyEvent *event) override;
+    /*!
+    *  \brief Fonction qui gère les appuis des touches de la clavier
+    */
     void keyPressEvent( QKeyEvent * event ) override;
+    /*!
+    *  \brief Fonction qui gère les fin d'appuis des touches de la souris
+    */
     void mouseReleaseEvent(QMouseEvent *e) override;
-    void timerEvent(QTimerEvent *e) override;
-    void initializeGL() override;
-    void resizeGL(int w, int h) override;
-    void paintGL() override;
-    void mainLoop();
-    void parsingMapFile();
-    void parsingTextureFile();
-    void initShaders();
-    void initTextures();
+    /*!
+    *  \brief Fonction appelée lors du déplacement de la souris
+    *  Cette fonction gère le déplacement d'angle de la caméra et la mobilité du joueur
+    */
     void mouseMoveEvent(QMouseEvent* event);
+    /*!
+    *  \brief Fonction appelé pèriodiquement par Qt
+    */
+    void timerEvent(QTimerEvent *e) override;
+    /*!
+    *  \brief Initialise la plupars des objets nécéssaire au fonctionnement du moteur
+    */
+    void initializeGL() override;
+    /*!
+    *  \brief Fonction appelé quand la taille de la fenêtre est modifé
+    */
+    void resizeGL(int w, int h) override;
+    /*!
+    *  \brief Affiche les objets présents dans la scène
+    */
+    void paintGL() override;
+    /*!
+    *  \brief Boucle de jeu qui gère les updates des objets de la scène
+    */
+    void mainLoop();
+    /*!
+    *  \brief Parse le fichier de map pour construire la map et remplir le graphe de scène
+    */
+    void parsingMapFile();
+    /*!
+    *  \brief Initialise le tableau des textures
+    */
+    void parsingTextureFile();
+    /*!
+    *  \brief Initialise les listes d'entités
+    */
+    void parsingEntityFile();
+    /*!
+    *  \brief Initialise les shaders d'openGL
+    */
+    void initShaders();
+    /*!
+    *  \brief Initialise des textures
+    */
+    void initTextures();
+    /*!
+    *  \brief Active/Désactive le plein écran
+    */
     void on_action_Fullscreen_triggered();
+    /*!
+    *  \brief Initialise le niveau 1
+    */
     void initialiseLevel();
-    Ennemy * closestPlayerTarget(Player * p);
+
 private:
     QTimer *timers;
     QMap<int, bool> keys;
@@ -136,6 +197,7 @@ private:
     std::vector<QOpenGLTexture *> lTextures;
     QOpenGLTexture * medicTexture;
     QOpenGLTexture * monsterTexture;
+    QOpenGLTexture * armorTexture;
     //Cameras
     Camera * camera;
     //gameBooleans
