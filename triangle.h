@@ -22,6 +22,7 @@ public :
     QVector3D getT3() const{
         return t3;
     }
+
 };
 
 #endif // TRIANGLE_H

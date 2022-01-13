@@ -2,7 +2,7 @@
 #define BOUNDINGBOX_H
 #include <QVector3D>
 #include <vector>
-
+#include "triangle.h"
 /**
  * @brief Représente une bounding box avec un point contenant les coordonées minimales de l'objet et un point représentant les coordonées maximales
  * @author Pierre.L
@@ -55,6 +55,14 @@ public:
      *
      */
     boundingBox(std::vector<QVector3D> vertices);
+
+    /*!
+     *  \brief Constructeur
+     *
+     *  \param triangle : un triangle a englober
+     *
+     */
+    boundingBox(triangle _triangle);
 
     ////Methods
     /*!

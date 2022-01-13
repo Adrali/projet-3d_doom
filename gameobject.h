@@ -7,7 +7,7 @@
 #include <QtMultimedia/QMediaPlayer>
 #include <vector>
 #include "boundingbox.h"
-
+#include "gameTime.h"
 
 
 
@@ -96,6 +96,11 @@ public :
      * \return std::vector de QVector3D reprÃ©sentant les vertexs
      */
     std::vector<QVector3D> getActualVertices();
+
+    /*!
+     * \brief Retourne la liste ordonnée des indices des vertex du mesh
+     * \return std::vector de QVector3D reprÃ©sentant les vertexs
+     */
     std::vector<int> getActualIndexs(){return mesh->getIndex();}
     /*!
      * \brief Retourne la boundingBox du gameobject
@@ -129,19 +134,38 @@ public :
      * \return Triangle le plus proche. Si il n'y a pas de triangle, alors renvoie un triangle avec pour sommet (0,0,0)
      */
     triangle getClosestTriangleDown(QVector3D p,double & distance);
+    /*!
+     * \brief Retourne un vector avec la liste des triangles du mesh
+
+     * \return Retourne un vector avec la liste des triangles
+     */
+    std::vector<triangle> getTriangleList();
+
+    /*!
+     * \brief Prédicat vrai si la bb donnée en parametre
+     *
+     * \param _bb : une boundingbox
+     *
+     * \return Retourne vrai si _bb intersecte avec l'un des triangles du mesh
+     */
+    bool isBBoxIntersect(boundingBox _bb);
 
     //Debug methods
     /*!
-     * \brief Fonction de dÃ©bug qui affiche la liste des vertices du mesh de base
+     * \brief Fonction de débug qui affiche la liste des vertices du mesh de base
      */
-    void displayBaseValue(){
-        qInfo() << "Creation"<<endl;
+    void displayBaseValues(){
         std::vector<QVector3D> v = mesh->getBaseVertices();
         for(QVector3D ver : v){
-            qInfo()<<ver<<endl;
+            qInfo()<<ver;
         }
     }
+    /*!
+     * \brief Retourne le type de géométrie du mesh
+     *
 
+     * \return le type de géométrie du mesh
+     */
     int getGeometryType(){
         return mesh->getType();
     }
@@ -150,10 +174,10 @@ public :
 protected:
     ////Variables
     ///
-    QOpenGLTexture * texture;
-    GeometryEngine * mesh;
-    bool isDisplaying = true;
-    transformation transform;
+    QOpenGLTexture * texture; //Texture du gameobject
+    GeometryEngine * mesh; //Mesh du gameobject
+    bool isDisplaying = true; //Vrai si l'objet doit d'afficher
+    transformation transform; //Transform du gameobject
     std::vector<gameobject *> childs;
     gameobject();
 

@@ -4,5 +4,6 @@
         <file>sounds/shoot.wav</file>
         <file>sounds/pickupLoot.wav</file>
         <file>sounds/level1Music.wav</file>
+        <file>sounds/hit.wav</file>
     </qresource>
 </RCC>

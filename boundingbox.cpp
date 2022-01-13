@@ -23,6 +23,21 @@ boundingBox::boundingBox(std::vector<QVector3D> vertices)
     }
 }
 
+
+boundingBox::boundingBox(triangle _triangle){
+    QVector3D lVertices[3] = {_triangle.getT1(),_triangle.getT2(),_triangle.getT3()};
+
+    minVertex = QVector3D(std::numeric_limits<double>::infinity(),std::numeric_limits<double>::infinity(),std::numeric_limits<double>::infinity());
+    maxVertex = QVector3D(-1 * std::numeric_limits<float>::infinity(),-1 * std::numeric_limits<float>::infinity(),-1 * std::numeric_limits<float>::infinity());
+    for(QVector3D v : lVertices){
+        for(int i=0;i<3;i++){
+            if(v[i] < minVertex[i])
+                minVertex[i] = v[i];
+            else if(v[i] > maxVertex[i])
+                maxVertex[i] = v[i];
+        }
+    }
+}
 bool boundingBox::isOverlapping1D(float vmin1, float vmax1,float vmin2, float vmax2){
     return !(vmax1<vmin2 || vmax2 < vmin1);
 }

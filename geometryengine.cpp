@@ -277,14 +277,16 @@ void GeometryEngine::initPlanGeometry(){
 /**
  *
  * Remy BARRIOL
- * Gestion de l'affichage des meshs suivant leurs types (l'UI est un OBJ avec un affichage spÃ©ciale)
+ * Gestion de l'affichage des meshs suivant leurs types (l'UI est un OBJ avec un affichage spéciale)
  */
 
 void GeometryEngine::drawGeometry(QOpenGLShaderProgram *program)
 {
 
     int transColor = program->attributeLocation("red");
-    program->setAttributeValue(transColor,0.0f);
+    //program->setAttributeValue(transColor,0.0f);
+    program->setAttributeValue(transColor,UI.red);
+
     if((typeGeo==1)||(typeGeo==0))
     {
         // Tell OpenGL which VBOs to use
@@ -413,10 +415,16 @@ void GeometryEngine::drawGeometryObject(QOpenGLShaderProgram *program,bool trans
 /**
  *
  * Remy BARRIOL
- * Mise Ã  jour des informations de l'interface
+ * Mise à jour des informations de l'interface
  */
 void GeometryEngine::updateUI(int health,int ammo[6],bool key[3],int armor,int weapon,int stadeAnim)
 {
+    if((UI.health-health)>0)
+        {
+            UI.red=(UI.health-health);
+        }
+        else
+              UI.red*=.99;
     UI.health=health;
     UI.armor=armor;
     UI.weapon=weapon;
@@ -429,6 +437,16 @@ void GeometryEngine::updateUI(int health,int ammo[6],bool key[3],int armor,int w
     {
         UI.key[i]=key[i];
     }
+    if(health<=100)
+            UI.head=0;
+        if(health<=80)
+            UI.head=1;
+        if(health<=60)
+            UI.head=2;
+        if(health<=40)
+            UI.head=3;
+        if(health<=20)
+            UI.head=4;
 
 }
 
@@ -760,7 +778,7 @@ void GeometryEngine::drawUI(QOpenGLShaderProgram *program)
             GeolTextures->at(Tex)->bind();
 
 
-            //GÃ¨re la transparence seulement pour l'interface
+            //Gère la transparence seulement pour l'interface
             glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
             glEnable(GL_BLEND);
             glDrawElements(GL_TRIANGLE_FAN, 3 , GL_UNSIGNED_SHORT, (GLvoid*)(sizeof(GLushort)*i*3));

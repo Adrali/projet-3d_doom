@@ -69,7 +69,6 @@ MainWidget::MainWidget(QWidget *parent) :
     QApplication::changeOverrideCursor(cursor);
     mainMusic = new QSound(QString::fromStdString(":/sounds/level1Music.wav"));
     mainMusic->setLoops(QSound::Infinite);
-
 }
 
 MainWidget::~MainWidget()
@@ -89,7 +88,9 @@ MainWidget::~MainWidget()
 void MainWidget::mousePressEvent(QMouseEvent * event)
 {
     if (event->button() == Qt::LeftButton) {
-            player->shoot(lEnnemy);
+            if(!isPause){
+                player->shoot(lEnnemy);
+            }
     }
 }
 
@@ -152,9 +153,12 @@ void MainWidget::timerEvent(QTimerEvent *)
 
     //Recalcul de la caméra
     //camera->actualiseMatrix();
+    GameTime::notifyNewFrame();
+
     if(!isPause){
         mainLoop();
     }
+    //qInfo() << GameTime::getDeltaTime();
     update();
 }
 
@@ -175,6 +179,7 @@ void MainWidget::mouseMoveEvent(QMouseEvent* event){
     /*qInfo() << "X:" <<deltax;
     qInfo() << "Y:" <<deltay;*/
     //On tourne le joueur
+
     if(!isPause){
         player->turnEntity(deltax/(maxDeltaX*1.0));
 
@@ -274,11 +279,8 @@ void MainWidget::initializeGL()
     //t.addRotationY(180);
     //t.addScale(22,22,22);
     objGeometries.at(2)->setUI();
-    bool key[3];
-    key[0]=false;
-    key[1]=false;
-    key[2]=false;
-    int ammo[6];
+    bool key[3] = {false, false, false};
+    int ammo[6] = {0,523,0,0,0,0};
     ammo[1]=523;
     objGeometries.at(2)->updateUI(22,ammo,key,28,1,1);
     gameobject * go1 = new gameobject(objGeometries.at(2),t,defaultTexture);
@@ -287,7 +289,7 @@ void MainWidget::initializeGL()
     mainMusic->play();
 
 
-
+    GameTime::initGameTime();
     // Use QBasicTimer because its faster than QTimer
     timer.start(12, this);
 }

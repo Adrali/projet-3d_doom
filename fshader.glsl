@@ -37,7 +37,7 @@ void main()
     }
 
 
-    //gl_FragColor.r=gl_FragColor.r+((255-gl_FragColor.r)*(red1/1000));
+    gl_FragColor.r=gl_FragColor.r+((255-gl_FragColor.r)*(red1/1000));
 
 
 }

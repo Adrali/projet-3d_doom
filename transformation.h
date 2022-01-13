@@ -5,12 +5,14 @@
 #include <math.h>
 
 
-
-
-
-
 /**
  * @brief Représente une matrice de transformation. On peut lui appliquer diverses transformations supplémentaire et transformer des vecteurs
+ * @author Pierre.L
+ * @version 0.1
+ * @date 20 dec 2021
+ *
+ * Header de la classe Ennemy. Hérite de Entity
+ *
  */
 class transformation
 {

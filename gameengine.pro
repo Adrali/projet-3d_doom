@@ -24,6 +24,7 @@ HEADERS += \
     ennemy.h \
     entity.h \
     file3D.h \
+    gameTime.h \
     gameobject.h \
     loot.h \
     mainwidget.h \

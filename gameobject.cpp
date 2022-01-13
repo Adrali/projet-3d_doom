@@ -49,6 +49,41 @@ QVector3D gameobject::getBarycentre(){
     return barycentre;
 }
 
+std::vector<triangle> gameobject::getTriangleList(){
+    std::vector<int> indexs = getActualIndexs();
+    std::vector<QVector3D> vertices = getActualVertices();
+    std::vector<triangle> lTriangles;
+
+    if(mesh->getType()>=2){
+        for(unsigned int i=0;(i+2)<indexs.size();i+=3){
+            lTriangles.push_back(triangle(vertices[indexs[i]],vertices[indexs[i+1]],vertices[indexs[i+2]]));
+
+
+        }
+    }else{
+        for(unsigned int i=0;(i+2)<indexs.size();i++){
+            if(indexs[i+1]!=indexs[i+2]){
+                lTriangles.push_back(triangle(vertices[indexs[i]],vertices[indexs[i+1]],vertices[indexs[i+2]]));
+            }else{//Si on a un double indice, on passe au triangle suivant.
+                i+=3;
+            }
+        }
+    }
+    return lTriangles;
+}
+
+bool gameobject::isBBoxIntersect(boundingBox _bb){
+    std::vector<triangle> lTriangle = getTriangleList();
+    for(triangle t : lTriangle){
+        boundingBox b(t);
+        if(_bb.isOverlapping(b)){
+            return true;
+        }
+    }
+    return false;
+}
+
+
 triangle gameobject::getClosestTriangleDown(QVector3D p){
     std::vector<int> indexs = getActualIndexs();
     std::vector<QVector3D> vertices = getActualVertices();

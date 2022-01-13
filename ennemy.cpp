@@ -12,7 +12,7 @@ void Ennemy::updatePosition(){
     QVector3D newPoint(x,y,z);
     //Actualise la hauteur du joueur
     double minDistance = std::numeric_limits<double>::infinity();
-    /*for(gameobject * go : map->getChilds()){
+    for(gameobject * go : map->getChilds()){
         if(go->getBBox().isOverBoundingBox(newPoint)){
             double actDistance;
             triangle actTriangle = go->getClosestTriangleDown(newPoint);
@@ -30,7 +30,7 @@ void Ennemy::updatePosition(){
         if(vitesseChuteMax < (minDistance - hauteurSol))
             delta = vitesseChuteMax;
         y = y - delta;
-    }*/
+    }
 
     //Actualise la pos du joueur
     t.addTranslation(x,y,z);
@@ -39,4 +39,17 @@ void Ennemy::updatePosition(){
     //qInfo() << x << " " << y << " " << z << endl;
     this->setTransform(t);
 
+}
+
+void Ennemy::update(){
+    updatePosition();
+    if(attackCooldown > 0){
+        attackCooldown -= GameTime::getDeltaTime();
+    }else{
+        if (getBarycentre().distanceToPoint(player->getBarycentre()) < 20.0f){
+            player->takeDamages(10);
+            attackCooldown=2;
+            damageSound->play();
+        }
+    }
 }

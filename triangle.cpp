@@ -8,6 +8,8 @@ triangle::triangle(QVector3D t1_,QVector3D t2_,QVector3D t3_) : t1(t1_),t2(t2_),
     normal = QVector3D::crossProduct(t2-t1,t3-t1);
     normal.normalize();
 }
+
+
 bool triangle::PointInTriangle(QVector3D p) {
   // Lets define some local variables, we can change these
   // without affecting the references passed in
@@ -58,3 +60,4 @@ double triangle::hauteurPoint(QVector3D v){
     else
         return std::numeric_limits<double>::infinity();
 }
+

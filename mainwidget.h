@@ -59,6 +59,7 @@
 #include "ennemy.h"
 #include "loot.h"
 #include "const_entity.h"
+#include "gameTime.h"
 
 #include <QOpenGLWidget>
 #include <QOpenGLFunctions_3_1>

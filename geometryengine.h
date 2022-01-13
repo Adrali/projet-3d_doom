@@ -101,7 +101,7 @@ struct UIgo
                 int weaponStade3[2];
 
                 //std::vector<unsigned int>* linkFileTextureGeo;
-
+                float red=0;
                 int textureNumber[10];
                 int stadeAnimWeapon1[3];
 };
